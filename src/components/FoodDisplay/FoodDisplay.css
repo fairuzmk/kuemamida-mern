@@ -1,5 +1,7 @@
 .food-display{
     margin-top: 30px;
+    margin-left: 8vw;
+    margin-right: 8vw;
 
 }
 
@@ -14,4 +16,52 @@
     margin-top: 30px;
     gap: 30px;
     row-gap: 50px;
+}
+
+
+.pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.pagination a {
+    color: black;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color .3s;
+    border: 1px solid #ddd;
+    cursor: pointer
+}
+.pagination .active {
+    background-color: var(--primary-color);
+    color: white;
+    border: 1px solid var(--primary-color);
+}
+.pagination a:disabled {
+
+    color: gray;
+    cursor: not-allowed;
+}
+
+@media(max-width: 600px){
+    .food-display-list{
+
+        grid-template-columns: repeat(auto-fill,minmax(180px,1fr));
+        margin-top: 20px;
+        gap: 20px;
+        row-gap: 20px;
+    }
+}
+
+@media(max-width: 470px){
+    .food-display-list{
+
+        grid-template-columns: repeat(auto-fill,minmax(120px,1fr));
+        margin-top: 20px;
+        gap: 20px;
+        row-gap: 20px;
+    }
 }

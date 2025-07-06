@@ -14,6 +14,7 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  scroll-behavior: smooth;
 
 }
 
@@ -25,9 +26,11 @@ a{
   text-decoration: none;
   color: inherit;
 }
+
 .app{
-  width: 80%;
+  width: 100%;
   margin: auto;
+  padding-top:15vh
 
 }
 

@@ -143,3 +143,59 @@ border-radius: 15px 15px 0px 0px;
     padding:5px;
     border-radius: 5px;
 }
+
+
+@media(max-width: 600px){
+
+    .food-item-name-rating{
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+    
+    .svg-star-icon{
+
+        font-size:12px;
+       
+    }
+
+    .food-item-name-rating p{
+        font-size: 20px;
+
+    
+    }
+    
+    .food-item-desc{
+        font-size: 12px;
+    }
+    
+    .food-item-price{
+        font-size: 20px;
+    }
+}
+
+@media(max-width: 470px){
+
+    
+    .svg-star-icon{
+        
+        font-size:10px;
+       
+    }
+
+    .food-item-name-rating p{
+        font-size: 18px;
+
+    
+    }
+    
+    .food-item-desc{
+        font-size: 12px;
+    }
+    
+    .food-item-price{
+        font-size: 18px;
+    }
+
+}

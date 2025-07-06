@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useContext } from 'react'
+
 import './FoodItem.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faStar } from '@fortawesome/free-solid-svg-icons'
@@ -7,9 +8,12 @@ import { faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faMinus } from '@fortawesome/free-solid-svg-icons'
 
-const FoodItem = ({id, name, price, description, image, rating, inStock}) => {
+import { StoreContext } from '../../context/StoreContext'
+
+const FoodItem = ({id, name, price, description, image, rating, inStock, category}) => {
 
     
+
 
     // Rating
     const renderStars = (rating) => {
@@ -26,21 +30,23 @@ const FoodItem = ({id, name, price, description, image, rating, inStock}) => {
         return stars;
       };
 
-      const [itemCount, setItemCount] = useState(0);
+      const{cartItems,addToCart,removeFromCart,url} = 
+      useContext(StoreContext);
      
+
 
 
   return (
     <div className='food-item'>
         <div className="food-item-img-container">
-            <img className='food-item-image' src={image} alt="" />
-            {!itemCount
-                ?<div className="addIcon"><FontAwesomeIcon icon={faPlus} className="svg-add-icon" onClick={()=>setItemCount(prev=>prev+1)}/></div>
+            <img className='food-item-image' src={url + "/images/" + image} alt="" />
+            {!cartItems[id]
+                ?<div className="addIcon"><FontAwesomeIcon icon={faPlus} className="svg-add-icon" onClick={()=>addToCart(id)}/></div>
                 
                 :<div className="food-item-counter">
-                    <FontAwesomeIcon icon={faMinus} className="svg-minus-icon" onClick={()=>setItemCount(prev=>prev-1)}/>
-                    <p>{itemCount}</p>
-                    <FontAwesomeIcon icon={faPlus} className="svg-plus-icon" onClick={()=>setItemCount(prev=>prev+1)}/>
+                    <FontAwesomeIcon icon={faMinus} className="svg-minus-icon" onClick={()=>removeFromCart(id)}/>
+                    <p>{cartItems[id]}</p>
+                    <FontAwesomeIcon icon={faPlus} className="svg-plus-icon" onClick={()=>addToCart(id)}/>
                 </div>
 
             }
@@ -60,8 +66,9 @@ const FoodItem = ({id, name, price, description, image, rating, inStock}) => {
                 
 
             </div>
-            <p className="food-item-price">Rp. {price}</p>
+            <p className="food-item-price">Rp. {price.toLocaleString("id-ID")}</p>
             <p className="food-item-desc">{description}</p>
+            <p className="food-item-desc">{category}</p>
             
         </div>
     </div>

@@ -1,8 +1,9 @@
 
 
 .header{
-    height:40vw;
-    margin: 50px auto;
+    height:65vh;
+
+    margin-bottom: 5vh;
     background: url('https://images.unsplash.com/photo-1574344069030-b2926f1b3d06?q=80&w=1933&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat;
     background-size: cover;
     background-position: center;
@@ -32,7 +33,6 @@
 .header-content p{
     color:white;
     font-size:1vw;
-
 }
 
 .header-content button{
@@ -50,4 +50,44 @@
 .header-content button:hover{
     background-color:var(--primary-color);
     color: white;
+}
+
+@media(max-width: 850px){
+
+    .header-content{
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5vw;
+        max-width: 100%;
+        bottom:10%;
+        left:6vw;
+        animation: fadeIn 3s;
+        font-family: var(--heading-font);
+    
+    }
+
+    .header-content h2{
+        font-weight: 500;
+        color:white;
+        font-size: max(4.5vw,22px);
+        text-align: center;
+    }
+    
+    .header-content p{
+        color:white;
+        font-size:2.5vw;
+        text-align: center;
+    }
+
+    .header-content button{
+
+       
+        padding: 1vw 2.3vw;
+        background-color: white;
+        font-size: max(2vw,15px);
+        
+
+    }
 }

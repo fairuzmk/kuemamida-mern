@@ -40,6 +40,19 @@ export const menu_list = [
 
 const categories = ["Kue Ultah", "Kue Kering", "Cake Potong"];
 
+const url = "http://localhost:4000";
+
+    // const food_list = async () => {
+    //   const response = await axios.get(`${url}/api/food/list`);
+    //   console.log(response.data)
+    //   if (response.data.success){
+    //     setList(response.data.data)
+    //   }
+    //   else{
+    //     toast.error("Error")
+    //   }
+    // }
+
 export const food_list = Array.from({ length: 10 }, (_, i) => ({
     _id: `${i + 1}`,
     name: `Makanan ${i + 1}`,
