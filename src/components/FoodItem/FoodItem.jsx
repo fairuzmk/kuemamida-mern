@@ -9,11 +9,12 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faMinus } from '@fortawesome/free-solid-svg-icons'
 
 import { StoreContext } from '../../context/StoreContext'
+import { useNavigate } from 'react-router-dom'
 
 const FoodItem = ({id, name, price, description, image, rating, inStock, category}) => {
 
-    
-
+      const navigate = useNavigate();
+    const slug = name.toLowerCase().replace(/\s+/g, '-');
 
     // Rating
     const renderStars = (rating) => {
@@ -39,7 +40,7 @@ const FoodItem = ({id, name, price, description, image, rating, inStock, categor
   return (
     <div className='food-item'>
         <div className="food-item-img-container">
-            <img className='food-item-image' src={url + "/images/" + image} alt="" />
+            <img className='food-item-image' src={image} alt="" />
             {!cartItems[id]
                 ?<div className="addIcon"><FontAwesomeIcon icon={faPlus} className="svg-add-icon" onClick={()=>addToCart(id)}/></div>
                 
@@ -59,7 +60,7 @@ const FoodItem = ({id, name, price, description, image, rating, inStock, categor
         </div>
         <div className="food-item-info">
             <div className="food-item-name-rating">
-                <p>{name}</p>
+                <p onClick={() => navigate(`/detail/${slug}-${id}`)}>{name}</p>
                 <div className="star">
                     {renderStars(rating)}
                 </div>

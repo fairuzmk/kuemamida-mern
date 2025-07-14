@@ -8,6 +8,7 @@ import Footer from './components/Footer/Footer'
 import LoginPopup from './components/LoginPopup/LoginPopup'
 import ProtectedRoute from './components/ProtectedRoute';
 import CustomOrder from './pages/CustomOrder/CustomOrder'
+import DetailPage from './pages/DetailPage/DetailPage'
 
 const App = () => {
 
@@ -21,6 +22,7 @@ const App = () => {
       <Navbar setShowLogin={setShowLogin} />  
       <Routes>
         <Route path='/' element={<Home/>} />
+        <Route path='/detail/:slugAndId' element={<DetailPage/>} />
         <Route path='/cart' element={<Cart/>} />
         <Route path="/order" element={
           <ProtectedRoute>
