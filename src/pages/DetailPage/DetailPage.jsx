@@ -1,13 +1,11 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import './DetailPage.css'
 import { StoreContext } from '../../context/StoreContext'
 import { useParams } from 'react-router-dom';
 
-const VARIANTS = [
-  { value: '16', label: '16 cm', price: 150000 },
-  { value: '18', label: '18 cm', price: 180000 },
-  { value: '20', label: '20 cm', price: 210000 }
-];
+
+
+
 
 const DetailPage = () => {
     const { slugAndId } = useParams();
@@ -17,21 +15,30 @@ const DetailPage = () => {
     const product = food_list.find((item) => item._id === id);
     
     console.log("Semua produk:", food_list);
-console.log("ID dari URL:", id);
+    console.log("ID dari URL:", id);
 
-console.log("Produk ditemukan:", product);
+    console.log("Produk ditemukan:", product);
 
     const [quantity, setQuantity] = useState(1);
-    const [selectedVariant, setSelectedVariant] = useState(VARIANTS[0]);
+    const [selectedVariant, setSelectedVariant] = useState(null);
+
+    useEffect(() => {
+    // set varian default saat produk ready
+    if (product && product.varians && product.varians.length > 0) {
+        setSelectedVariant(product.varians[0]);
+    }
+    }, [product]);
+
+    const handleVariantChange = (varianName) => {
+    const variant = product.varians.find(v => v.varianName === varianName);
+    if (variant) setSelectedVariant(variant);
+    };
 
     const handleQuantityChange = (amount) => {
         setQuantity(prev => Math.max(1, prev + amount));
     };
 
-    const handleVariantChange = (value) => {
-        const variant = VARIANTS.find(v => v.value === value);
-        setSelectedVariant(variant);
-    };
+    
     
     if (!food_list.length) return <div>Memuat produk...</div>;
     if (!product) return <div>Produk tidak ditemukan.</div>;
@@ -46,7 +53,7 @@ return (
       {/* Detail */}
       <div className="product-details">
         <h1 className="product-title">{product.name}</h1>
-        <p className="product-price">Rp{selectedVariant.price.toLocaleString()}</p>
+        <p className="product-price">Rp{selectedVariant.varianPrice.toLocaleString()}</p>
 
         <div className="product-rating">
           <span className="stars">★★★★★</span>
@@ -55,19 +62,19 @@ return (
 
         {/* Varian */}
         <div className="form-group">
-          <label>Pilih Diameter:</label>
+          <label>Pilih Variant:</label>
           <div className="radio-group">
-            {VARIANTS.map((variant) => (
-              <label key={variant.value} className={`radio-option ${selectedVariant.value === variant.value ? 'active' : ''}`}>
+            {product.varians.map((variant) => (
+            <label key={variant.varianName} className={`radio-option ${selectedVariant?.varianName === variant.varianName ? 'active' : ''}`}>
                 <input
-                  type="radio"
-                  name="variant"
-                  value={variant.value}
-                  checked={selectedVariant.value === variant.value}
-                  onChange={() => handleVariantChange(variant.value)}
+                type="radio"
+                name="variant"
+                value={variant.varianName}
+                checked={selectedVariant?.value === variant.varianName}
+                onChange={() => handleVariantChange(variant.varianName)}
                 />
-                {variant.label}
-              </label>
+                {variant.varianName}
+            </label>
             ))}
           </div>
         </div>
