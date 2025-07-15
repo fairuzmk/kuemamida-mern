@@ -9,6 +9,9 @@ import LoginPopup from './components/LoginPopup/LoginPopup'
 import ProtectedRoute from './components/ProtectedRoute';
 import CustomOrder from './pages/CustomOrder/CustomOrder'
 import DetailPage from './pages/DetailPage/DetailPage'
+import ManualPayment from './pages/Payments/ManualPayment'
+import VerifyPage from './pages/Payments/VerifyPage'
+import MyOrders from './pages/MyOrders/MyOrders'
 
 const App = () => {
 
@@ -24,6 +27,9 @@ const App = () => {
         <Route path='/' element={<Home/>} />
         <Route path='/detail/:slugAndId' element={<DetailPage/>} />
         <Route path='/cart' element={<Cart/>} />
+        <Route path='/payment' element={<ManualPayment/>} />
+        <Route path="/verify" element={<VerifyPage />} />
+        <Route path="/my-orders" element={<MyOrders />} />
         <Route path="/order" element={
           <ProtectedRoute>
             <PlaceOrder />

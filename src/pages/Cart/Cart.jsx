@@ -16,53 +16,49 @@ const Cart = () => {
 
   return (
     <div className='cart'>
-      <div className="cart-items">
-        <div className="cart-items-title">
-          <p>Items</p>
-          <p>Title</p>
-          <p>Price</p>
-          <p>Quantity</p>
-          <p>Total</p>
-          <p>Remove</p>
-        </div>
-        <br />
-        <hr />
-        {Object.entries(cartItems).map(([itemKey, qty]) => {
-            if (qty <= 0) return null;
+      <h1>Keranjang Saya</h1>
+      <div className="cart-grid">
+        <div className="cart-items">
+          
+          <hr />
+          {Object.entries(cartItems).map(([itemKey, qty]) => {
+              if (qty <= 0) return null;
 
-            const [id, varianName] = itemKey.split('_');
-            const product = food_list.find(item => item._id === id);
-            if (!product) return null;
+              const [id, varianName] = itemKey.split('_');
+              const product = food_list.find(item => item._id === id);
+              if (!product) return null;
 
-            const variant = product.varians?.find(v => v.varianName === varianName);
-            const price = variant?.varianPrice || product.price;
+              const variant = product.varians?.find(v => v.varianName === varianName);
+              const price = variant?.varianPrice || product.price;
 
-            return (
-              <div key={itemKey}>
-                <div className="cart-items-title cart-items-item">
-                  <img src={product.image} alt="" />
-                  <p>{product.name} {variant ? `(${variant.varianName})` : ''}</p>
-                  <p>Rp. {price.toLocaleString("id-ID")}</p>
-                  <p>{qty}</p>
-                  <p className='price-item'>Rp. {(price * qty).toLocaleString("id-ID")}</p>
-                  <p onClick={() => removeFromCart(itemKey)} className='delete-item'><FontAwesomeIcon icon={faTrash} /></p>
+              return (
+                <div key={itemKey}>
+                  <div className="cart-items-title cart-items-item">
+                    <img src={product.image} alt="" />
+                    <div className='cart-items-item-description'>
+                    <h3>{product.name} </h3>
+                    <p>{variant ? `Varian: ${variant.varianName}` : ''}</p>
+                    <p>{qty} x {price.toLocaleString("id-ID")}</p>
+                    
+                    </div>
+                    <div className='cart-items-item-details'>
+                    <p>Rp. {(price * qty).toLocaleString("id-ID")}</p>
+                    
+                    
+                    </div>
+                    
+                    {/* <p>{qty}</p>
+                    <p className='price-item'>Rp. {(price * qty).toLocaleString("id-ID")}</p>
+                    <p onClick={() => removeFromCart(itemKey)} className='delete-item'><FontAwesomeIcon icon={faTrash} /></p> */}
+                  </div>
+                  <hr />
                 </div>
-                <hr />
-              </div>
-            );
-          })}
+              );
+            })}
 
 
-       
-      </div>
-       <div className="cart-items-total">
-
-        <p>Total </p>
-        <p>Rp. {getTotalCartAmount().toLocaleString("id-ID")}</p>
-        <p></p>
-
+        
         </div>
-      <div className="cart-bottom">
         <div className="cart-total">
           <h2>Total Belanja</h2>
           <div className="cart-total-details">
@@ -79,10 +75,18 @@ const Cart = () => {
             <b>Total</b>
             <p>Rp. {getTotalCartAmount()===0?0:(getTotalCartAmount()- 0).toLocaleString("id-ID")}</p>
           </div>
+          <div className='cart-total-button'>
           <button onClick={() => navigate('/order')}
             disabled={isCartEmpty}
             style={{ opacity: isCartEmpty ? 0.5 : 1, cursor: isCartEmpty ? 'not-allowed' : 'pointer' }}><FontAwesomeIcon icon={faTruckFast}/> CHECKOUT</button>
+          </div>
+          
         </div>
+      </div>
+      
+       
+      <div className="cart-bottom">
+        
         {/* VOUCHER DISKON */}
         <div className="cart-promocode">
           
@@ -96,8 +100,28 @@ const Cart = () => {
             </div>
           </div>
         </div>
+        
       </div>
       
+      <div className="cart-total-float">
+        <div>
+          <p>Total ({quantityItem()} items):</p>
+          <p>Rp. {getTotalCartAmount().toLocaleString("id-ID")}</p>
+        </div>
+        <div className='cart-total-button'>
+        <button
+          
+          onClick={() => navigate('/order')}
+          disabled={isCartEmpty}
+          style={{
+            opacity: isCartEmpty ? 0.5 : 1, cursor: isCartEmpty ? 'not-allowed' : 'pointer'
+          }}
+        >
+          <FontAwesomeIcon icon={faTruckFast}/> CHECKOUT
+        </button>
+        </div>
+        
+      </div>
     </div>
   )
 }

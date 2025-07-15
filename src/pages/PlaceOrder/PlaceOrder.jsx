@@ -3,6 +3,9 @@ import './PlaceOrder.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faCreditCard } from '@fortawesome/free-solid-svg-icons';
 import { StoreContext } from '../../context/StoreContext'
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 
 
 
@@ -16,21 +19,80 @@ import { StoreContext } from '../../context/StoreContext'
 
 
 const PlaceOrder = () => {
+  const navigate = useNavigate();
 
-const {getShippingCost, getTotalCartAmount, quantityItem} = useContext(StoreContext);
+  const {getTotalCartAmount, quantityItem, cartItems, food_list, url} = useContext(StoreContext);
 
   const [selectedShipping, setSelectedShipping] = useState(shippingOptions[0]);
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
 
+  const handlePlaceOrder = async (e) => {
+      e.preventDefault();
+    
+      const token = localStorage.getItem("token"); // asumsinya token disimpan di localStorage
+    
+      const payload = {
+        items: Object.entries(cartItems).map(([key, qty]) => {
+          const [productId, variant] = key.split('_');
+          const product = food_list.find(p => p._id === productId);
+          const selectedVar = product?.varians?.find(v => v.varianName === variant);
+    
+          return {
+            itemId: productId,
+            name: product.name,
+            quantity: qty,
+            price: selectedVar ? selectedVar.varianPrice : product.price,
+            variant: selectedVar?.varianName || null,
+          };
+        }),
+        amount: getTotalCartAmount(),
+        shipping_fee: selectedShipping.cost,
+        shipping_method: selectedShipping.value,
+        payment_method: "manual_transfer",
+        address: {
+          name,
+          phone,
+          detail: address,
+        }
+      };
+    
+      try {
+        const res = await axios.post(`${url}/api/order/place`, payload, {
+          headers: { token }
+        });
+    
+        if (res.data.success) {
+          navigate(`/verify?success=true&orderId=${res.data.orderId}`);
+        } else {
+          alert("Gagal membuat order");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Terjadi kesalahan");
+      }
+    };
 
   return (
-    <form action="" className="place-order">
+    <form action="" className="place-order" onSubmit={handlePlaceOrder}>
       <div className="place-order-left">
         <p className="title">Informasi Pengiriman</p>
         
         <div className="multi-fields">
-          <input type="text" placeholder='Nama Penerima' />
+        <input
+            type="text"
+            placeholder='Nama Penerima'
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
         </div>
-        <input type="text" placeholder='Nomor HP (Whatsapp)'/>
+        <input
+            type="text"
+            placeholder='Nomor HP (Whatsapp)'
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
         <div className="form-select">
           
           <select
@@ -48,7 +110,11 @@ const {getShippingCost, getTotalCartAmount, quantityItem} = useContext(StoreCont
             ))}
           </select>
         </div>
-        <textarea type="text" placeholder='Alamat Lengkap'/>
+        <textarea
+          placeholder='Alamat Lengkap'
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+        />
       </div>
       <div className="place-order-right">
         <div className="cart-total">
@@ -67,7 +133,10 @@ const {getShippingCost, getTotalCartAmount, quantityItem} = useContext(StoreCont
             <b>Total</b>
             <p>Rp. {(getTotalCartAmount()+selectedShipping.cost).toLocaleString("id-ID")}</p>
           </div>
-          <button ><FontAwesomeIcon icon={faCreditCard}/> PROCEED TO PAYMENT</button>
+          <div className='cart-total-button'>
+          <button type='submit'><FontAwesomeIcon icon={faCreditCard}/> PROCEED TO PAYMENT</button>
+          </div>
+          
         </div>
       </div>
     </form>

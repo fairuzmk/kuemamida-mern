@@ -61,15 +61,17 @@ const FoodItem = ({id, name, price, description, image, rating, inStock, categor
         <div className="food-item-info">
             <div className="food-item-name-rating">
                 <p onClick={() => navigate(`/detail/${slug}-${id}`)}>{name}</p>
-                <div className="star">
-                    {renderStars(rating)}
-                </div>
+                
                 
 
             </div>
-            <p className="food-item-price">Rp. {price.toLocaleString("id-ID")}</p>
             <p className="food-item-desc">{description}</p>
             <p className="food-item-desc">{category}</p>
+            <div className="star">
+                {renderStars(rating)}
+            </div>
+            <p className="food-item-price">Rp. {price.toLocaleString("id-ID")}</p>
+            
             
         </div>
     </div>

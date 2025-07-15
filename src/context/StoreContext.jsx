@@ -10,7 +10,8 @@ const StoreContextProvider = (props) => {
 
     const [cartItems, setCartItems] = useState({});
 
-    const url = "https://kuemamida-backend.onrender.com";
+    // const url = "https://kuemamida-backend.onrender.com";
+    const url = "http://localhost:4000";
     const [token, setToken] = useState(() => {
         return localStorage.getItem("token") || "";
     });
@@ -43,14 +44,18 @@ const StoreContextProvider = (props) => {
     //     return totalAmount;
     // }
 
-    const addToCart = (itemKey) => {
+    const addToCart = async (itemKey) => {
         setCartItems((prev) => ({
             ...prev,
             [itemKey]: (prev[itemKey] || 0) + 1,
         }));
+
+        if (token) {
+            await axios.post(url+"/api/cart/add", {itemKey}, {headers: {token}})
+        }
         };
 
-        const removeFromCart = (itemKey) => {
+        const removeFromCart = async (itemKey) => {
         setCartItems((prev) => {
             const updated = { ...prev };
             if (updated[itemKey] > 1) {
@@ -60,6 +65,9 @@ const StoreContextProvider = (props) => {
             }
             return updated;
         });
+        if (token) {
+            await axios.post(url+"/api/cart/remove", {itemKey}, {headers: {token}})
+        }
         };
 
         const getTotalCartAmount = () => {
@@ -90,10 +98,19 @@ const StoreContextProvider = (props) => {
         }
       }
 
+      const loadCartData = async (token) => {
+        const response = await axios.post(url+"/api/cart/get", {}, {headers:{token}})
+        setCartItems(response.data.cartData);
+      }
+
     useEffect(()=>{
 
         async function loadData(){
             await fetchFoodList();
+            if (localStorage.getItem("token")) {
+                setToken(localStorage.getItem("token"));
+                await loadCartData(localStorage.getItem("token"));
+            }
 
         }
 
