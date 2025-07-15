@@ -2,7 +2,8 @@ import React, { useContext, useEffect, useState } from 'react'
 import './DetailPage.css'
 import { StoreContext } from '../../context/StoreContext'
 import { useParams } from 'react-router-dom';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons'
 
 
 
@@ -10,10 +11,12 @@ import { useParams } from 'react-router-dom';
 const DetailPage = () => {
     const { slugAndId } = useParams();
     const id = slugAndId.split('-').slice(-1)[0]; // ID tetap lengkap (24 karakter)
-    const { food_list } = useContext(StoreContext);
-
+    const { food_list, cartItems,addToCart,removeFromCart,url } = useContext(StoreContext);
+    
     const product = food_list.find((item) => item._id === id);
     
+
+
     console.log("Semua produk:", food_list);
     console.log("ID dari URL:", id);
 
@@ -22,6 +25,9 @@ const DetailPage = () => {
     const [quantity, setQuantity] = useState(1);
     const [selectedVariant, setSelectedVariant] = useState(null);
 
+    const itemKey = selectedVariant
+    ? `${product._id}_${selectedVariant.varianName}`
+    : null;
     useEffect(() => {
     // set varian default saat produk ready
     if (product && product.varians && product.varians.length > 0) {
@@ -53,7 +59,7 @@ return (
       {/* Detail */}
       <div className="product-details">
         <h1 className="product-title">{product.name}</h1>
-        <p className="product-price">Rp{selectedVariant.varianPrice.toLocaleString()}</p>
+        <p className="product-price">Rp{(selectedVariant?.varianPrice || product.price).toLocaleString()}</p>
 
         <div className="product-rating">
           <span className="stars">★★★★★</span>
@@ -82,14 +88,13 @@ return (
         {/* Quantity */}
         <div className="form-group">
           <label>Jumlah:</label>
-          <div className="quantity-selector">
-            <button onClick={() => handleQuantityChange(-1)}>-</button>
-            <span>{quantity}</span>
-            <button onClick={() => handleQuantityChange(1)}>+</button>
+          <div className="item-counter">
+            <FontAwesomeIcon icon={faMinus} onClick={() => removeFromCart(itemKey)} />
+            <p>{cartItems[itemKey] || 0}</p>
+            <FontAwesomeIcon icon={faPlus} onClick={() => addToCart(itemKey)} />
           </div>
         </div>
 
-        <button className="add-to-cart">Tambah ke Keranjang</button>
 
         {/* Deskripsi */}
         <div className="product-description">

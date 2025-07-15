@@ -27,30 +27,31 @@ const Cart = () => {
         </div>
         <br />
         <hr />
-        {food_list.map((item,index)=> {
-          if(cartItems[item._id]>0){
-            return(
-              <div>
-              <div className="cart-items-title cart-items-item">
-                <img src={url+ "/images/" + item.image} alt="" />
-                <p>{item.name}</p>
-                <p>Rp. {item.price.toLocaleString("id-ID")}</p>
-                <p>{cartItems[item._id]}</p>
-                <p className='price-item'>Rp. {(item.price * cartItems[item._id]).toLocaleString("id-ID")}</p>
-                <p onClick={()=>removeFromCart(item._id)} className='delete-item'><FontAwesomeIcon icon={faTrash}/></p>
+        {Object.entries(cartItems).map(([itemKey, qty]) => {
+            if (qty <= 0) return null;
 
-              </div>
-              <hr />
-              
-              </div>
-              
-            )
-            
-          }
+            const [id, varianName] = itemKey.split('_');
+            const product = food_list.find(item => item._id === id);
+            if (!product) return null;
 
-        })
-        
-        }
+            const variant = product.varians?.find(v => v.varianName === varianName);
+            const price = variant?.varianPrice || product.price;
+
+            return (
+              <div key={itemKey}>
+                <div className="cart-items-title cart-items-item">
+                  <img src={product.image} alt="" />
+                  <p>{product.name} {variant ? `(${variant.varianName})` : ''}</p>
+                  <p>Rp. {price.toLocaleString("id-ID")}</p>
+                  <p>{qty}</p>
+                  <p className='price-item'>Rp. {(price * qty).toLocaleString("id-ID")}</p>
+                  <p onClick={() => removeFromCart(itemKey)} className='delete-item'><FontAwesomeIcon icon={faTrash} /></p>
+                </div>
+                <hr />
+              </div>
+            );
+          })}
+
 
        
       </div>
@@ -70,29 +71,31 @@ const Cart = () => {
           </div>
           <hr />
           <div className="cart-total-details">
-            <p>Ongkos Kirim</p>
-            <p>{getTotalCartAmount()===0?0:getShippingCost()}</p>
+            <p>Diskon</p>
+            <p>{getTotalCartAmount()===0?0:0}</p>
           </div>
           <hr />
           <div className="cart-total-details">
             <b>Total</b>
-            <p>Rp. {getTotalCartAmount()===0?0:(getTotalCartAmount()+getShippingCost()).toLocaleString("id-ID")}</p>
+            <p>Rp. {getTotalCartAmount()===0?0:(getTotalCartAmount()- 0).toLocaleString("id-ID")}</p>
           </div>
           <button onClick={() => navigate('/order')}
             disabled={isCartEmpty}
             style={{ opacity: isCartEmpty ? 0.5 : 1, cursor: isCartEmpty ? 'not-allowed' : 'pointer' }}><FontAwesomeIcon icon={faTruckFast}/> CHECKOUT</button>
         </div>
+        {/* VOUCHER DISKON */}
         <div className="cart-promocode">
-        <div>
-          <p>VOUCHER DISKON</p>
+          
           <div>
-            <div className="cart-promocode-input">
-              <input type="text" placeholder='Kode Voucher' />
-              <button>Apply</button>
+            <p>VOUCHER DISKON</p>
+            <div>
+              <div className="cart-promocode-input">
+                <input type="text" placeholder='Kode Voucher' />
+                <button>Apply</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
       </div>
       
     </div>

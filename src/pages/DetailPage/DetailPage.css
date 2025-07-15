@@ -124,6 +124,36 @@
   line-height: 1.6;
 }
 
+.item-counter{
+    width: 90px;
+    height: 35px;
+    cursor: pointer;
+    position: flex;
+    background-color: whitesmoke;
+    border-radius: 6px;
+    display: flex;            
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3); /* opsional efek */
+}
+
+.svg-plus-icon{
+    font-size: 16px;
+    color: green;
+    background-color: #7ee8c696;
+    padding:5px;
+    border-radius: 5px;
+}
+
+.svg-minus-icon{
+    font-size: 16px;
+    color: red;
+    background-color: #ff71bf65;
+    padding:5px;
+    border-radius: 5px;
+}
+
 /* RESPONSIVE */
 @media (min-width: 768px) {
   .product-container {

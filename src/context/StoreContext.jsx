@@ -17,32 +17,67 @@ const StoreContextProvider = (props) => {
 
     const [food_list, setFoodList] = useState([])
 
-    const addToCart = (itemId) => {
-        if (!cartItems[itemId]) {
-            setCartItems((prev) => ({ ...prev, [itemId]: 1 }))
+    // const addToCart = (itemId) => {
+    //     if (!cartItems[itemId]) {
+    //         setCartItems((prev) => ({ ...prev, [itemId]: 1 }))
 
-        }
-        else {
-            setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }))
-        }
-    }
+    //     }
+    //     else {
+    //         setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }))
+    //     }
+    // }
 
-    const removeFromCart = (itemId) => {
-        setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }))
-    }
+    // const removeFromCart = (itemId) => {
+    //     setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }))
+    // }
 
-    const getTotalCartAmount = () => {
-        let totalAmount = 0;
-        for (const item in cartItems) {
-            if (cartItems[item] > 0) {
-                let itemInfo = food_list.find((product) => product._id === item);
-                totalAmount += itemInfo.price * cartItems[item];
+    // const getTotalCartAmount = () => {
+    //     let totalAmount = 0;
+    //     for (const item in cartItems) {
+    //         if (cartItems[item] > 0) {
+    //             let itemInfo = food_list.find((product) => product._id === item);
+    //             totalAmount += itemInfo.price * cartItems[item];
+    //         }
+
+    //     }
+    //     return totalAmount;
+    // }
+
+    const addToCart = (itemKey) => {
+        setCartItems((prev) => ({
+            ...prev,
+            [itemKey]: (prev[itemKey] || 0) + 1,
+        }));
+        };
+
+        const removeFromCart = (itemKey) => {
+        setCartItems((prev) => {
+            const updated = { ...prev };
+            if (updated[itemKey] > 1) {
+            updated[itemKey] -= 1;
+            } else {
+            delete updated[itemKey];
             }
+            return updated;
+        });
+        };
 
+        const getTotalCartAmount = () => {
+        let totalAmount = 0;
+        for (const itemKey in cartItems) {
+            if (cartItems[itemKey] > 0) {
+            const [id, varian] = itemKey.split('_');
+            const itemInfo = food_list.find((product) => product._id === id);
+
+            const varianPrice = itemInfo?.varians?.find(v => v.varianName === varian)?.varianPrice;
+            const basePrice = itemInfo?.price || 0;
+            const finalPrice = varianPrice || basePrice;
+
+            totalAmount += finalPrice * cartItems[itemKey];
+            }
         }
         return totalAmount;
-    }
-
+        };
     const fetchFoodList = async () => {
         const response = await axios.get(url+"/api/food/list");
         console.log(response.data)
