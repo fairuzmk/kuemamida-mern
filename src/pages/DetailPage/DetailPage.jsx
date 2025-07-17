@@ -61,10 +61,10 @@ return (
         <h1 className="product-title">{product.name}</h1>
         <p className="product-price">Rp{(selectedVariant?.varianPrice || product.price).toLocaleString()}</p>
 
-        <div className="product-rating">
+        {/* <div className="product-rating">
           <span className="stars">★★★★★</span>
           <span className="reviews">(150 ulasan)</span>
-        </div>
+        </div> */}
 
         {/* Varian */}
         <div className="form-group">

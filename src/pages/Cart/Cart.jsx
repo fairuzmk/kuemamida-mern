@@ -41,6 +41,7 @@ const Cart = () => {
                     <p>{qty} x {price.toLocaleString("id-ID")}</p>
                     
                     </div>
+                    
                     <div className='cart-items-item-details'>
                     <p>Rp. {(price * qty).toLocaleString("id-ID")}</p>
                     

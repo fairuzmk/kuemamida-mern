@@ -26,7 +26,7 @@
 
 .product-price {
   font-size: 20px;
-  color: green;
+  color: var(--primary-color);
   font-weight: bold;
 }
 
@@ -77,10 +77,10 @@
 }
 
 .radio-option.active {
-  border-color: #28a745;
-  background-color: #e6f8ec;
+  border-color: var(--primary-color);
+  background-color: var(--background-primary);
   font-weight: bold;
-  color: #28a745;
+  color: var(--primary-color);
 }
 
 .quantity-selector {
@@ -125,6 +125,7 @@
 }
 
 .item-counter{
+    
     width: 90px;
     height: 35px;
     cursor: pointer;
@@ -134,8 +135,13 @@
     display: flex;            
     justify-content: space-between;
     align-items: center;
-    padding: 5px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.3); /* opsional efek */
+    padding: 7px;
+    border: 1px solid #ccc;
+}
+
+.item-counter p{
+  color: var(--primary-color);
+  font-weight: bold;
 }
 
 .svg-plus-icon{

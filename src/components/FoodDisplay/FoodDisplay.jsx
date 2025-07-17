@@ -35,6 +35,7 @@ const FoodDisplay = ({ category }) => {
             rating={item.rating}
             inStock={item.inStock}
             category={item.category}
+            varians={item.varians}
           />
         ))}
       </div>

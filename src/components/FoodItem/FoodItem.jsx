@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 
 import './FoodItem.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -11,7 +11,7 @@ import { faMinus } from '@fortawesome/free-solid-svg-icons'
 import { StoreContext } from '../../context/StoreContext'
 import { useNavigate } from 'react-router-dom'
 
-const FoodItem = ({id, name, price, description, image, rating, inStock, category}) => {
+const FoodItem = ({id, name, price, varians, image, rating, inStock, category}) => {
 
       const navigate = useNavigate();
     const slug = name.toLowerCase().replace(/\s+/g, '-');
@@ -33,14 +33,17 @@ const FoodItem = ({id, name, price, description, image, rating, inStock, categor
 
       const{cartItems,addToCart,removeFromCart,url} = 
       useContext(StoreContext);
-     
+      const [showAll, setShowAll] = useState(false);
+
+      const visibleVarians = showAll ? varians : varians.slice(0, 2);
+      const hiddenCount = varians.length - 2;
 
 
 
   return (
     <div className='food-item'>
         <div className="food-item-img-container">
-            <img className='food-item-image' src={image} alt="" />
+            <img className='food-item-image' src={image} alt="" onClick={() => navigate(`/detail/${slug}-${id}`)}/>
             {!cartItems[id]
                 ?<div className="addIcon"><FontAwesomeIcon icon={faPlus} className="svg-add-icon" onClick={()=>addToCart(id)}/></div>
                 
@@ -65,11 +68,21 @@ const FoodItem = ({id, name, price, description, image, rating, inStock, categor
                 
 
             </div>
-            <p className="food-item-desc">{description}</p>
-            <p className="food-item-desc">{category}</p>
-            <div className="star">
+           <p className="food-item-varian">
+           {visibleVarians.map((item, index) => (
+            <span key={index} className="food-item-varian-badge">{item.varianName}</span>
+          ))}
+
+          {!showAll && hiddenCount > 0 && (
+            <span className="food-item-varian-more" onClick={() => setShowAll(true)}>
+              +{hiddenCount} more
+            </span>
+          )}
+          </p>
+            
+            {/* <div className="star">
                 {renderStars(rating)}
-            </div>
+            </div> */}
             <p className="food-item-price">Rp. {price.toLocaleString("id-ID")}</p>
             
             

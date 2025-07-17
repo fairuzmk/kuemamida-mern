@@ -15,9 +15,40 @@
 
 }
 
+.food-item-varian{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.food-item-varian-badge {
+    display: inline-block;
+    background-color: #f3d7d7;
+    color: var(--primary-color);
+    font-size: 12px;
+    padding: 3px 5px;
+    margin-right: 2px;
+    margin-bottom: 3px;
+    border-radius: 999px;
+    font-weight: 500;
+}
+
+.food-item-varian-more{
+    background-color: #f3d7d7;
+    color: var(--primary-color);
+    font-size: 12px;
+    padding: 3px 5px;
+    margin-right: 2px;
+    margin-bottom: 3px;
+    border-radius: 999px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
 .food-item-image{
     width: 100%;
     border-radius: 15px 15px 0px 0px;
+    cursor: pointer;
 
 }
 
@@ -163,7 +194,7 @@ border-radius: 15px 15px 0px 0px;
     }
 
     .food-item-name-rating p{
-        font-size: 20px;
+        font-size: 16px;
 
     
     }

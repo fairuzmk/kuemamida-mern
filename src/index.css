@@ -5,6 +5,7 @@
 :root {
   --primary-color: #a51717;
   --secondary-color: #e0e4d9;
+  --background-primary: #f3d7d7;
   --text-color: #333333;
   --navbar-font: "Inter", sans-serif;
   --heading-font: "Oswald", sans-serif;
