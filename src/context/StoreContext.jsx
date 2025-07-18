@@ -10,8 +10,8 @@ const StoreContextProvider = (props) => {
 
     const [cartItems, setCartItems] = useState({});
 
-    const url = "https://kuemamida-backend.onrender.com";
-    // const url = "http://localhost:4000";
+    // const url = "https://kuemamida-backend.onrender.com";
+    const url = "http://localhost:4000";
     const [token, setToken] = useState(() => {
         return localStorage.getItem("token") || "";
     });
@@ -50,6 +50,7 @@ const StoreContextProvider = (props) => {
             [itemKey]: (prev[itemKey] || 0) + 1,
         }));
 
+        
         if (token) {
             await axios.post(url+"/api/cart/add", {itemKey}, {headers: {token}})
         }
