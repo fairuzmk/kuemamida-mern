@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import './PlaceOrder.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faCreditCard } from '@fortawesome/free-solid-svg-icons';
@@ -10,20 +10,21 @@ import { useNavigate } from 'react-router-dom';
 
 
 
-  const shippingOptions = [
-  { value: 'pickup', label: '', jarak:'Ambil di Tempat', cost: 0 },
-  { value: 'cod-0', label: 'Kurir Custom : ', jarak:'< 2km' , cost: 0 },
-  { value: 'cod-20', label: 'Kurir Custom : ',jarak:'2-4km', cost: 20000 },
-  { value: 'cod-35', label: 'Kurir Custom : ', jarak:'> 4km', cost: 35000 },
-  ];
+
 
 
 const PlaceOrder = () => {
   const navigate = useNavigate();
 
-  const {getTotalCartAmount, quantityItem, cartItems, food_list, url} = useContext(StoreContext);
+  const {getTotalCartAmount, quantityItem, cartItems, food_list, url, options, fetchOptions} = useContext(StoreContext);
 
-  const [selectedShipping, setSelectedShipping] = useState(shippingOptions[0]);
+  useEffect(() => {
+    fetchOptions();
+  }, []);
+
+
+  const [selectedShipping, setSelectedShipping] = useState( {value: "", label: "", price: 0});
+
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
@@ -48,7 +49,7 @@ const PlaceOrder = () => {
           };
         }),
         amount: getTotalCartAmount(),
-        shipping_fee: selectedShipping.cost,
+        shipping_fee: selectedShipping.price,
         shipping_method: selectedShipping.value,
         payment_method: "manual_transfer",
         address: {
@@ -81,6 +82,7 @@ const PlaceOrder = () => {
         
         <div className="multi-fields">
         <input
+            required
             type="text"
             placeholder='Nama Penerima'
             value={name}
@@ -96,19 +98,25 @@ const PlaceOrder = () => {
         <div className="form-select">
           
           <select
+            required
             placeholder="Pilih Metode Pengiriman"
             value={selectedShipping.value}
             onChange={(e) => {
-              const selected = shippingOptions.find(opt => opt.value === e.target.value);
-              setSelectedShipping(selected);
+              const selected = options.shipping.find(opt => opt.value === e.target.value);
+              if (selected) setSelectedShipping(selected);
             }}
           >
-            {shippingOptions.map(option => (
+            <option value="" disabled>
+              Pilih Metode Pengiriman
+            </option>
+            {options.shipping.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label} {option.jarak} - Rp{option.cost.toLocaleString("id-ID")}
+              {option.label} - Rp{option.price ? option.price.toLocaleString("id-ID") : 0}
               </option>
             ))}
           </select>
+
+
         </div>
         <textarea
           placeholder='Alamat Lengkap'
@@ -126,12 +134,12 @@ const PlaceOrder = () => {
           <hr />
           <div className="cart-total-details">
             <p>Ongkos Kirim ({selectedShipping.jarak})</p>
-            <p>Rp. {selectedShipping.cost.toLocaleString("id-ID")}</p>
+            <p>Rp. {selectedShipping.price.toLocaleString("id-ID")}</p>
           </div>
           <hr />
           <div className="cart-total-details">
             <b>Total</b>
-            <p>Rp. {(getTotalCartAmount()+selectedShipping.cost).toLocaleString("id-ID")}</p>
+            <p>Rp. {(getTotalCartAmount()+selectedShipping.price).toLocaleString("id-ID")}</p>
           </div>
           <div className='cart-total-button'>
           <button type='submit'><FontAwesomeIcon icon={faCreditCard}/> PROCEED TO PAYMENT</button>

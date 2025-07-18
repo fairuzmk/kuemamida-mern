@@ -18,31 +18,6 @@ const StoreContextProvider = (props) => {
 
     const [food_list, setFoodList] = useState([])
 
-    // const addToCart = (itemId) => {
-    //     if (!cartItems[itemId]) {
-    //         setCartItems((prev) => ({ ...prev, [itemId]: 1 }))
-
-    //     }
-    //     else {
-    //         setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }))
-    //     }
-    // }
-
-    // const removeFromCart = (itemId) => {
-    //     setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }))
-    // }
-
-    // const getTotalCartAmount = () => {
-    //     let totalAmount = 0;
-    //     for (const item in cartItems) {
-    //         if (cartItems[item] > 0) {
-    //             let itemInfo = food_list.find((product) => product._id === item);
-    //             totalAmount += itemInfo.price * cartItems[item];
-    //         }
-
-    //     }
-    //     return totalAmount;
-    // }
 
     const addToCart = async (itemKey) => {
         setCartItems((prev) => ({
@@ -87,9 +62,55 @@ const StoreContextProvider = (props) => {
         }
         return totalAmount;
         };
+
+        const [options, setOptions] = useState({
+            diameter: [],
+            bentuk: [],
+            rasa: [],
+            filling: [],
+            krim: [],
+            shipping: []
+          });
+
+        const fetchOptions = async () => {
+            try {
+              const res = await axios.get(`${url}/api/options`);
+              const allOptions = res.data.data.map((doc) => doc.options || {});
+              const mergedOptions = Object.assign({}, ...allOptions);
+          
+              if (mergedOptions) {
+                const diameterList = mergedOptions["Diameter"] || [];
+                const bentukList = mergedOptions["Bentuk"] || [];
+                const rasaList = mergedOptions["Rasa"] || [];
+                const fillingList = mergedOptions["Filling"] || [];
+                const krimList = mergedOptions["Krim"] || [];
+                const shippingList = mergedOptions["Shipping Fee"] || [];
+          
+                const formatted = (list) =>
+                  list.map((item) => ({
+                    value: item.value,
+                    label: item.label,
+                    price: item.price,
+                  }));
+          
+                setOptions({
+                  diameter: formatted(diameterList),
+                  bentuk: formatted(bentukList),
+                  rasa: formatted(rasaList),
+                  filling: formatted(fillingList),
+                  krim: formatted(krimList),
+                  shipping: formatted(shippingList),
+                });
+              }
+            } catch (err) {
+              console.error("Gagal mengambil data opsi:", err);
+            }
+          };
+
+    
     const fetchFoodList = async () => {
         const response = await axios.get(url+"/api/food/list");
-        console.log(response.data)
+        
         setFoodList(response.data.data)
         if (response.data.success){
           
@@ -130,10 +151,7 @@ const StoreContextProvider = (props) => {
         return quantity;
     }
 
-    const getShippingCost = () => {
-        let shippingcost=20000;
-        return shippingcost;
-    }
+
 
     const contextValue = {
         food_list,
@@ -143,10 +161,11 @@ const StoreContextProvider = (props) => {
         removeFromCart,
         getTotalCartAmount,
         quantityItem,
-        getShippingCost,
         url,
         token, 
-        setToken
+        setToken,
+        fetchOptions,
+        options
     }
 
 

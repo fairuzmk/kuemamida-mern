@@ -10,25 +10,117 @@
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    max-width: 500px;
+    max-width: 750px;
     background-color: #fff;
+    display: relative;
+  }
+
+
+  .badge-verify{
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    
+  }
+
+  .badge-verify img{
+      height: 200px;
+      width: auto;
+      margin-top: 20px;
+      margin-bottom: 20px;
+
   }
   
-  .success {
-    border-left: 6px solid #28a745;
+  .verify-end {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    justify-content: flex-end;
   }
-  
-  .error {
-    border-left: 6px solid #dc3545;
+ 
+  .button-blue{
+    padding: 10px;
+    background-color: #0d5cae;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+
   }
-  
-  .back-button {
+
+.copy-verify{
+  display: flex;
+  gap: 5px;
+  margin-top: 30px;
+  justify-content: center;
+}
+
+  .button-blue:hover{
+    opacity: 0.9;
+  }
+
+  .button-primary{
+    padding: 10px;
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .button-primary:hover{
+    opacity: 0.9;
+  }
+
+  .button-green{
+    padding: 10px;
+    background-color: #007c1b;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .button-green:hover{
+    opacity: 0.9;
+  }
+
+
+  .bank-card{
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    max-width: 100%;
+    background-color: #fff;
     margin-top: 20px;
-    display: inline-block;
-    padding: 10px 18px;
-    background-color: #007bff;
-    color: #fff;
-    border-radius: 5px;
-    text-decoration: none;
+
   }
   
+  .bank-card img{
+    height: 40px;
+    margin-bottom: 10px;
+  }
+
+  .bank-card table{
+    margin: auto;
+    margin-top: 10px;
+    font-size : 18px;
+    text-align: justify;
+    width: 90%;
+    margin-bottom: 10px;
+  }
+
+  .total-order-verif{
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--primary-color)
+  }

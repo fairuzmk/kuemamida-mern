@@ -3,6 +3,13 @@ import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import './VerifyPage.css';
 import { StoreContext } from '../../context/StoreContext';
+import { FaFileInvoiceDollar, FaCopy } from "react-icons/fa";
+import { IoBagCheck } from "react-icons/io5";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Lottie from 'lottie-react';
+import checkCart from '../../assets/checkCart.json';
+
 
 const VerifyPage = () => {
   const [searchParams] = useSearchParams();
@@ -44,33 +51,88 @@ const VerifyPage = () => {
   if (loading) return <div className="verify-container">Memuat...</div>;
   if (error) return <div className="verify-container error">{error}</div>;
 
+   const nomerRek = "8010763836";
+
+   const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(nomerRek);
+      
+      toast.success("Nomer Rekening berhasil disalin!");
+    } catch (err) {
+      toast.error("Gagal menyalin: " + err.message);
+    }
+  };
+
+  const handleCopyNominal = async () => {
+    try {
+      await navigator.clipboard.writeText(order.amount + order.shipping_fee);
+      
+      toast.success("Nominal berhasil disalin!");
+    } catch (err) {
+      toast.error("Gagal menyalin: " + err.message);
+    }
+  };
   return (
     <div className="verify-container">
+      <div className="verify-box">
+      <div className="badge-verify">
+        <Lottie animationData={checkCart} loop={true} style={{ width: '200px', height: '200px' }}/>
+        {/* <img src="/food-package.png" alt="Order Status" /> */}
+      </div>
+      <div className="paragraph-verify">
       <h2>{success ? "Pesanan Berhasil Dibuat!" : "Pesanan Gagal"}</h2>
       {order && (
         <div className="order-summary">
-          <p><strong>ID Pesanan:</strong> {order._id}</p>
-          <p><strong>Nama Penerima:</strong> {order.address?.name}</p>
-          <p><strong>Nomor HP:</strong> {order.address?.phone}</p>
-          <p><strong>Alamat:</strong> {order.address?.detail}</p>
-          <p><strong>Metode Pengiriman:</strong> {order.shipping_method}</p>
-          <p><strong>Ongkir:</strong> Rp{order.shipping_fee.toLocaleString("id-ID")}</p>
-          <p><strong>Total:</strong> Rp{(order.amount + order.shipping_fee).toLocaleString("id-ID")}</p>
+          <p><strong>ID Pesanan:</strong> {order.invoiceCode}</p>
+          <p><strong>Nama Pemesan:</strong> {order.address?.name}</p>
+          
+          <p className='total-order-verif'><strong>Total:</strong> Rp{(order.amount + order.shipping_fee).toLocaleString("id-ID")}</p>
 
-          <h3>Rincian Item:</h3>
-          <ul>
-            {order.items.map((item, idx) => (
-              <li key={idx}>
-                {item.name} ({item.variant || 'default'}) x {item.quantity} - Rp{item.price.toLocaleString("id-ID")}
-              </li>
-            ))}
-          </ul>
+          
 
           <p style={{ marginTop: '1rem', fontStyle: 'italic' }}>
-            Silakan transfer manual sesuai total, lalu hubungi admin untuk konfirmasi pembayaran.
+            Silakan transfer via bank BCA dengan detail sebagai berikut :
           </p>
+          <div className="bank-card">
+            <img src="/logo-bca.png" alt="" />
+            <table>
+              <tbody>
+              <tr>
+                <td>Nama</td>
+                <td>:</td>
+                <td>Dini Rizkita Sari</td>
+              </tr>
+              <tr>
+                <td>Rekening</td>
+                <td>:</td>
+                <td>{nomerRek} </td>
+              </tr>
+              <tr>
+                <td>Nominal</td>
+                <td>:</td>
+                <td className='total-order-verif'>Rp {(order.amount + order.shipping_fee).toLocaleString("id-ID")}</td>
+              </tr>
+              </tbody>
+            </table>
+            <div className="copy-verify">
+            <button className='button-blue' onClick={handleCopy}> <FaCopy/>  Rekening</button>
+            <ToastContainer position="bottom-center" autoClose={2000} />
+            <button className='button-green' onClick={handleCopyNominal}> <FaCopy/> Nominal</button>
+                <ToastContainer position="bottom-center" autoClose={2000} />
+                </div>
+          </div>
+          
         </div>
       )}
+      </div>
+      <div className="verify-end">
+        <button className='button-blue'><FaFileInvoiceDollar/> Lihat Invoice</button>
+        <button className="button-primary" onClick={() => { window.location.href = "/my-orders"}}><IoBagCheck/> My Orders</button>
+      </div>
+      
+
+      </div>
+      
     </div>
   );
 };

@@ -124,7 +124,8 @@ const Navbar = ({setShowLogin}) => {
           
           </li>
 
-          <li><FontAwesomeIcon icon={faBagShopping} className='svg-navbar-icon'/><p>Orders</p></li>
+          <li onClick={() => { window.location.href = "/my-orders" }}><FontAwesomeIcon icon={faBagShopping} className='svg-navbar-icon'/><p>My Orders</p></li>
+
           <hr />
           <li onClick={logout}><FontAwesomeIcon icon={faRightFromBracket} className='svg-navbar-icon'/><p>Logout</p></li>
         </ul>

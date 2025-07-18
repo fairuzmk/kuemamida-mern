@@ -16,18 +16,14 @@ const DetailPage = () => {
     const product = food_list.find((item) => item._id === id);
     
 
-
-    console.log("Semua produk:", food_list);
-    console.log("ID dari URL:", id);
-
-    console.log("Produk ditemukan:", product);
-
     const [quantity, setQuantity] = useState(1);
     const [selectedVariant, setSelectedVariant] = useState(null);
 
     const itemKey = selectedVariant
     ? `${product._id}_${selectedVariant.varianName}`
     : null;
+
+    
     useEffect(() => {
     // set varian default saat produk ready
     if (product && product.varians && product.varians.length > 0) {
