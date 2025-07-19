@@ -112,7 +112,7 @@ const MyOrders = () => {
               
             </div>
             <div>
-              <button className="primary">Detail Transaksi</button>
+              <button className="primary" onClick={() => { window.location.href = `/verify?success=true&orderId=${order._id}`; }}>Detail Transaksi</button>
             </div>
             
           </div>
