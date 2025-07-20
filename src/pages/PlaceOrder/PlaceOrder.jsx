@@ -24,6 +24,7 @@ const PlaceOrder = () => {
 
 
   const [selectedShipping, setSelectedShipping] = useState( {value: "", label: "", price: 0});
+  const [payment_method, setPaymentMethod] = useState({ value: "" });
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -51,7 +52,7 @@ const PlaceOrder = () => {
         amount: getTotalCartAmount(),
         shipping_fee: selectedShipping.price,
         shipping_method: selectedShipping.value,
-        payment_method: "manual_transfer",
+        payment_method: payment_method,
         address: {
           name,
           phone,
@@ -95,6 +96,26 @@ const PlaceOrder = () => {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />
+
+        <div className="form-select">
+          
+          <select
+            required
+            placeholder="Pilih Metode Pengiriman"
+            value={payment_method}
+            onChange={(e) => setPaymentMethod({ value: e.target.value })}
+            
+          >
+            <option value="" disabled>
+              Pilih Metode Pembayaran
+            </option>
+            <option value="Transfer">Transfer</option>
+            <option value="COD">COD (Bayar di Tempat)</option>
+            
+          </select>
+
+
+        </div>
         <div className="form-select">
           
           <select
@@ -133,7 +154,7 @@ const PlaceOrder = () => {
           </div>
           <hr />
           <div className="cart-total-details">
-            <p>Ongkos Kirim ({selectedShipping.jarak})</p>
+            <p>Ongkos Kirim ({selectedShipping.value})</p>
             <p>Rp. {selectedShipping.price.toLocaleString("id-ID")}</p>
           </div>
           <hr />

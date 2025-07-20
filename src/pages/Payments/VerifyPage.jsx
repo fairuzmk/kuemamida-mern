@@ -74,6 +74,17 @@ const VerifyPage = () => {
       toast.error("Gagal menyalin: " + err.message);
     }
   };
+
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = order.invoiceImage;
+    const fileName = `invoice_${order.invoiceCode}.jpg`;
+    link.download = fileName; // atau .png, sesuai ekstensi
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="verify-container">
       <div className="verify-box">
@@ -142,7 +153,7 @@ const VerifyPage = () => {
           </div>
           
           <div className="verify-end">
-            <button className='button-blue'><FaFileInvoiceDollar/> Lihat Invoice</button>
+            <button className='button-blue' onClick={handleDownload}><FaFileInvoiceDollar/> Lihat Invoice</button>
             <button className="button-primary" onClick={() => { window.location.href = "/my-orders"}}><IoBagCheck/> My Orders</button>
           </div>
           </>
