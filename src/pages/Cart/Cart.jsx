@@ -5,10 +5,11 @@ import { food_list } from '../../assets/assets'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faTruckFast } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
+import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons'
 
 const Cart = () => {
 
-  const {cartItems, food_list, removeFromCart, getTotalCartAmount, getShippingCost, quantityItem, url} = useContext(StoreContext)
+  const {cartItems, food_list, addToCart,removeFromCart, getTotalCartAmount, getShippingCost, quantityItem, url} = useContext(StoreContext)
 
   const navigate = useNavigate();
 
@@ -39,7 +40,17 @@ const Cart = () => {
                     <h3>{product.name} </h3>
                     <p>{variant ? `Varian: ${variant.varianName}` : ''}</p>
                     <p>{qty} x {price.toLocaleString("id-ID")}</p>
-                    
+
+                    <div className='item-counter-cart-wrapper'>
+                      <div className="item-counter-cart">
+                        <FontAwesomeIcon icon={faMinus} onClick={() => removeFromCart(itemKey)} />
+                        <p>{cartItems[itemKey] || 0}</p>
+                        <FontAwesomeIcon icon={faPlus} onClick={() => addToCart(itemKey)} />
+                        
+                      </div>
+                      
+                    </div>
+
                     </div>
                     
                     <div className='cart-items-item-details'>

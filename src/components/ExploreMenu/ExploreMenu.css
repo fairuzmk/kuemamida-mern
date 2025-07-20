@@ -78,6 +78,18 @@
 
 @media(max-width: 670px){
 
+    .explore-menu-list{
+        
+        text-align: center;
+        margin: 10px 0px;
+        gap: 6px;
+    
+    }
+
+    .explore-menu-text{
+        font-size: 14px;
+    }
+
     .explore-menu-list-item img{
         width: 7.5vw;
         min-width: 70px;
@@ -92,6 +104,10 @@
         font-size: max(1vw, 12px);
         cursor: pointer;
     
+    }
+
+    .explore-menu h1{
+        font-size: 3vh;
     }
 
 }

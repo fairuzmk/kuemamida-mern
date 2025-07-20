@@ -45,9 +45,10 @@ const FoodItem = ({id, name, price, varians, image, rating, inStock, category}) 
         <div className="food-item-img-container">
             <img className='food-item-image' src={image} alt="" onClick={() => navigate(`/detail/${slug}-${id}`)}/>
             {!cartItems[id]
-                ?<div className="addIcon"><FontAwesomeIcon icon={faPlus} className="svg-add-icon" onClick={()=>addToCart(id)}/></div>
+                ? <></>
+                // <div className="addIcon"><FontAwesomeIcon icon={faPlus} className="svg-add-icon" onClick={()=>addToCart(id)}/></div>
                 
-                :<div className="food-item-counter">
+                : <div className="food-item-counter">
                     <FontAwesomeIcon icon={faMinus} className="svg-minus-icon" onClick={()=>removeFromCart(id)}/>
                     <p>{cartItems[id]}</p>
                     <FontAwesomeIcon icon={faPlus} className="svg-plus-icon" onClick={()=>addToCart(id)}/>

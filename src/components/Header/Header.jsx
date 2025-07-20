@@ -7,8 +7,8 @@ const Header = () => {
         
         <div className="header-content">
             <h2>Order your favourite cake here</h2>
-            <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minus suscipit id est quidem quas voluptatum delectus dolorem sed dignissimos eveniet quis quam officia quod ut, ea veniam sit velit hic.</p>
-            <button>View Menu</button>
+            <p>Di balik setiap kue yang kami sajikan, ada proses yang penuh cinta dan perhatian. Kami percaya bahwa kue yang baik bukan hanya soal rasa—tetapi juga soal pengalaman dan kehangatan yang menyertainya.</p>
+            
         </div>
     </div>
 

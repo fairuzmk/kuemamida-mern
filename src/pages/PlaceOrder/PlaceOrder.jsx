@@ -52,7 +52,7 @@ const PlaceOrder = () => {
         amount: getTotalCartAmount(),
         shipping_fee: selectedShipping.price,
         shipping_method: selectedShipping.value,
-        payment_method: payment_method,
+        payment_method: payment_method.value,
         address: {
           name,
           phone,
@@ -102,7 +102,7 @@ const PlaceOrder = () => {
           <select
             required
             placeholder="Pilih Metode Pengiriman"
-            value={payment_method}
+            value={payment_method.value}
             onChange={(e) => setPaymentMethod({ value: e.target.value })}
             
           >
@@ -154,9 +154,13 @@ const PlaceOrder = () => {
           </div>
           <hr />
           <div className="cart-total-details">
-            <p>Ongkos Kirim ({selectedShipping.value})</p>
+            <p>Ongkos Kirim </p>
             <p>Rp. {selectedShipping.price.toLocaleString("id-ID")}</p>
           </div>
+          <div className="cart-total-details">
+          {selectedShipping.value}
+          </div>
+          
           <hr />
           <div className="cart-total-details">
             <b>Total</b>
