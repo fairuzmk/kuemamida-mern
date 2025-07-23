@@ -16,13 +16,13 @@ import { useNavigate } from 'react-router-dom';
 const PlaceOrder = () => {
   const navigate = useNavigate();
 
-  const {getTotalCartAmount, quantityItem, cartItems, food_list, url, options, fetchOptions} = useContext(StoreContext);
+  const {getTotalCartAmount, quantityItem, cartItems, food_list, url, options, fetchOptions, setCartItems} = useContext(StoreContext);
 
   useEffect(() => {
     fetchOptions();
   }, []);
 
-
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedShipping, setSelectedShipping] = useState( {value: "", label: "", price: 0});
   const [payment_method, setPaymentMethod] = useState({ value: "" });
 
@@ -31,50 +31,79 @@ const PlaceOrder = () => {
   const [address, setAddress] = useState('');
 
   const handlePlaceOrder = async (e) => {
-      e.preventDefault();
-    
-      const token = localStorage.getItem("token"); // asumsinya token disimpan di localStorage
-    
-      const payload = {
-        items: Object.entries(cartItems).map(([key, qty]) => {
-          const [productId, variant] = key.split('_');
-          const product = food_list.find(p => p._id === productId);
-          const selectedVar = product?.varians?.find(v => v.varianName === variant);
-    
-          return {
-            itemId: productId,
-            name: product.name,
-            quantity: qty,
-            price: selectedVar ? selectedVar.varianPrice : product.price,
-            variant: selectedVar?.varianName || null,
-          };
-        }),
-        amount: getTotalCartAmount(),
-        shipping_fee: selectedShipping.price,
-        shipping_method: selectedShipping.value,
-        payment_method: payment_method.value,
-        address: {
-          name,
-          phone,
-          detail: address,
-        }
-      };
-    
-      try {
-        const res = await axios.post(`${url}/api/order/place`, payload, {
-          headers: { token }
-        });
-    
-        if (res.data.success) {
-          navigate(`/verify?success=true&orderId=${res.data.orderId}`);
-        } else {
-          alert("Gagal membuat order");
-        }
-      } catch (err) {
-        console.error(err);
-        alert("Terjadi kesalahan");
+    e.preventDefault();
+    setIsLoading(true); // mulai loading
+  
+    const token = localStorage.getItem("token");
+  
+    // Langkah 1: Bersihkan cart dari item yang tidak valid
+    const cleanedCartItems = Object.fromEntries(
+      Object.entries(cartItems).filter(([key]) => {
+        const [productId] = key.split('_');
+        return food_list.find(p => p._id === productId);
+      })
+    );
+  
+    // Update localStorage dan state (jika kamu pakai useState)
+    localStorage.setItem("cartItems", JSON.stringify(cleanedCartItems));
+    setCartItems(cleanedCartItems); // <-- pakai ini kalau pakai useState
+  
+    // Langkah 2: Buat payload hanya dari item valid
+    const items = Object.entries(cleanedCartItems)
+      .map(([key, qty]) => {
+        const [productId, variant] = key.split('_');
+        const product = food_list.find(p => p._id === productId);
+        if (!product) return null;
+  
+        const selectedVar = product.varians?.find(v => v.varianName === variant);
+  
+        return {
+          itemId: productId,
+          name: product.name,
+          quantity: qty,
+          price: selectedVar ? selectedVar.varianPrice : product.price,
+          variant: selectedVar?.varianName || null,
+        };
+      })
+      .filter(item => item !== null);
+  
+    if (items.length === 0) {
+      alert("Tidak ada item valid di keranjang.");
+      return;
+    }
+  
+    const payload = {
+      items,
+      amount: getTotalCartAmount(),
+      shipping_fee: selectedShipping.price,
+      shipping_method: selectedShipping.value,
+      payment_method: payment_method.value,
+      address: {
+        name,
+        phone,
+        detail: address,
       }
     };
+  
+    try {
+      const res = await axios.post(`${url}/api/order/place`, payload, {
+        headers: { token }
+      });
+  
+      if (res.data.success) {
+        navigate(`/verify?success=true&orderId=${res.data.orderId}`);
+      } else {
+        alert("Gagal membuat order");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan");
+    }
+    finally {
+      setIsLoading(false); // selesai loading
+    }
+  };
+  
 
   return (
     <form action="" className="place-order" onSubmit={handlePlaceOrder}>
@@ -167,7 +196,7 @@ const PlaceOrder = () => {
             <p>Rp. {(getTotalCartAmount()+selectedShipping.price).toLocaleString("id-ID")}</p>
           </div>
           <div className='cart-total-button'>
-          <button type='submit'><FontAwesomeIcon icon={faCreditCard}/> PROCEED TO PAYMENT</button>
+          <button type='submit' disabled={isLoading}><FontAwesomeIcon icon={faCreditCard}/> {isLoading?("Processing.."):("PROCEED TO PAYMENT")} </button>
           </div>
           
         </div>
