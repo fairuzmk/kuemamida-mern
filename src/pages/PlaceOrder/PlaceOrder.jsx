@@ -57,7 +57,10 @@ const PlaceOrder = () => {
   
         const selectedVar = product.varians?.find(v => v.varianName === variant);
   
+        const varianIndex = product.varians?.findIndex(v => v.varianName === variant);
+
         return {
+          _id: selectedVar ? `${productId}_${varianIndex}` : productId,
           itemId: productId,
           name: product.name,
           quantity: qty,

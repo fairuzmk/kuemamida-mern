@@ -160,6 +160,12 @@
     border-radius: 5px;
 }
 
+.stock-error{
+  font-size: 14px;
+  color: red;
+  
+}
+
 /* RESPONSIVE */
 @media (min-width: 768px) {
   .product-container {

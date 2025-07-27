@@ -4,6 +4,8 @@ import { StoreContext } from '../../context/StoreContext'
 import { useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 
@@ -56,6 +58,8 @@ return (
       <div className="product-details">
         <h1 className="product-title">{product.name}</h1>
         <p className="product-price">Rp{(selectedVariant?.varianPrice || product.price).toLocaleString()}</p>
+        <p>Stock: {selectedVariant?.varianStock}</p>
+        
 
         {/* <div className="product-rating">
           <span className="stars">★★★★★</span>
@@ -89,6 +93,9 @@ return (
             <p>{cartItems[itemKey] || 0}</p>
             <FontAwesomeIcon icon={faPlus} onClick={() => addToCart(itemKey)} />
           </div>
+          
+
+          <ToastContainer position="bottom-center" autoClose={2000} />
         </div>
 
 

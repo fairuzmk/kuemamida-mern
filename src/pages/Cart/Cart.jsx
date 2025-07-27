@@ -6,6 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faTruckFast } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { ToastContainer} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Cart = () => {
 
@@ -55,10 +57,11 @@ const Cart = () => {
                     
                     <div className='cart-items-item-details'>
                     <p>Rp. {(price * qty).toLocaleString("id-ID")}</p>
+                    <p>Stock: {variant.varianStock}</p>
                     
                     
                     </div>
-                    
+                    <ToastContainer position="bottom-center" autoClose={2000} />
                     {/* <p>{qty}</p>
                     <p className='price-item'>Rp. {(price * qty).toLocaleString("id-ID")}</p>
                     <p onClick={() => removeFromCart(itemKey)} className='delete-item'><FontAwesomeIcon icon={faTrash} /></p> */}

@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
-
+import { ToastContainer, toast } from 'react-toastify';
 
 
 
@@ -10,26 +10,58 @@ const StoreContextProvider = (props) => {
 
     const [cartItems, setCartItems] = useState({});
 
-    const url = "https://kuemamida-backend.onrender.com";
-    // const url = "http://localhost:4000";
+    // const url = "https://kuemamida-backend.onrender.com";
+    const url = "http://localhost:4000";
     const [token, setToken] = useState(() => {
         return localStorage.getItem("token") || "";
     });
 
     const [food_list, setFoodList] = useState([])
-
+    
 
     const addToCart = async (itemKey) => {
-        setCartItems((prev) => ({
-            ...prev,
-            [itemKey]: (prev[itemKey] || 0) + 1,
-        }));
-
-        
-        if (token) {
-            await axios.post(url+"/api/cart/add", {itemKey}, {headers: {token}})
-        }
-        };
+      const [id, varianName] = itemKey.split("_");
+  
+      // Cari item berdasarkan ID dari food_list
+      const itemInfo = food_list.find((product) => product._id === id);
+  
+      if (!itemInfo) {
+          toast.error("Produk tidak ditemukan");
+          return;
+      }
+  
+      // Ambil stock berdasarkan varian (jika ada) atau stock utama
+      let availableStock = 0;
+      if (varianName) {
+          const varian = itemInfo.varians?.find(v => v.varianName === varianName);
+          if (!varian) {
+              toast.error("Varian tidak ditemukan");
+              return;
+          }
+          availableStock = varian.varianStock;
+      } else {
+          availableStock = itemInfo.stock;
+      }
+  
+      const currentQty = cartItems[itemKey] || 0;
+  
+      // Proteksi: tidak boleh melebihi stock
+      if (currentQty >= availableStock) {
+          toast.warn("Stok tidak mencukupi");
+          return;
+      }
+  
+      // Tambah ke cart
+      setCartItems((prev) => ({
+          ...prev,
+          [itemKey]: currentQty + 1,
+      }));
+  
+      // Sync ke backend kalau ada token
+      if (token) {
+          await axios.post(url + "/api/cart/add", { itemKey }, { headers: { token } });
+      }
+  };
 
         const removeFromCart = async (itemKey) => {
         setCartItems((prev) => {
@@ -46,6 +78,7 @@ const StoreContextProvider = (props) => {
         }
         };
 
+        
         const getTotalCartAmount = () => {
         let totalAmount = 0;
         for (const itemKey in cartItems) {
