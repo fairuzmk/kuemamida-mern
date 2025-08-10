@@ -8,6 +8,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faInstagram, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { StoreContext } from '../../context/StoreContext';
+import axios from 'axios';
 library.add(faInstagram);
 
 const Navbar = ({setShowLogin}) => {
@@ -18,7 +19,9 @@ const Navbar = ({setShowLogin}) => {
 
     const [showSidebar, setShowSidebar] = useState(false);
 
-    const {getTotalCartAmount, token, setToken} = useContext(StoreContext);
+    const {getTotalCartAmount, token, setToken, url} = useContext(StoreContext);
+
+    const [user, setUser] = useState({ name: "", address: "" });
 
     const navigate = useNavigate();
 
@@ -29,6 +32,22 @@ const Navbar = ({setShowLogin}) => {
 
     }
 
+    useEffect(() => {
+      const fetchUser = async () => {
+        try {
+          const res = await axios.get(`${url}/api/user-new/account`, {
+            headers: { token }
+          });
+          if (res.data.success) {
+            setUser(res.data.user);
+          }
+        } catch (err) {
+          console.error(err);
+        } 
+      };
+      fetchUser();
+    }, [token]);
+  
 
   useEffect(() => {
     const handleScroll = () => {
@@ -80,7 +99,7 @@ const Navbar = ({setShowLogin}) => {
             :
             <>
             <li onClick={() => { setShowSidebar(false); }}>
-            <FontAwesomeIcon icon={faUser} className="svg-sidebar-icon" />Hai, Full Name</li>
+            <FontAwesomeIcon icon={faUser} className="svg-sidebar-icon" />Hai, {user.name}</li>
             <li onClick={() => { setShowSidebar(false); }}>
             <FontAwesomeIcon icon={faBagShopping} className="svg-sidebar-icon" />Your Order</li>
             <li onClick={() => { setShowLogin(false); setShowSidebar(false); }}>
@@ -115,11 +134,11 @@ const Navbar = ({setShowLogin}) => {
               className="svg-navbar-icon"
         />
         <ul className="nav-profile-dropdown">
-          <li><FontAwesomeIcon icon={faUser} 
+          <li onClick={() => { window.location.href = "/my-account" }}><FontAwesomeIcon icon={faUser} 
               className="svg-navbar-icon"/>
           <div className='account-dropdown'>
-          <p>Account Setting</p>
-          <span>(Full Name)</span>
+          <p>My Profile</p>
+          <span>({user.name})</span>
           </div>
           
           </li>

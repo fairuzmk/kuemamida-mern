@@ -5,13 +5,15 @@ import Home from './pages/Home/Home'
 import Cart from './pages/Cart/Cart'
 import PlaceOrder from './pages/PlaceOrder/PlaceOrder'
 import Footer from './components/Footer/Footer'
-import LoginPopup from './components/LoginPopup/LoginPopup'
+// import LoginPopup from './components/LoginPopup/LoginPopup'
 import ProtectedRoute from './components/ProtectedRoute';
 import CustomOrder from './pages/CustomOrder/CustomOrder'
 import DetailPage from './pages/DetailPage/DetailPage'
 import ManualPayment from './pages/Payments/ManualPayment'
 import VerifyPage from './pages/Payments/VerifyPage'
 import MyOrders from './pages/MyOrders/MyOrders'
+import LoginNewPopup from './components/LoginPopup/LoginNewPopUp'
+import AccountDetail from './pages/AccountDetails/AccountDetail'
 
 const App = () => {
 
@@ -21,7 +23,7 @@ const App = () => {
     <>
     
     <div className='app'>
-    {showLogin?<LoginPopup setShowLogin={setShowLogin}/>:<></>}
+    {showLogin?<LoginNewPopup setShowLogin={setShowLogin}/>:<></>}
       <Navbar setShowLogin={setShowLogin} />  
       <Routes>
         <Route path='/' element={<Home/>} />
@@ -30,6 +32,7 @@ const App = () => {
         <Route path='/payment' element={<ManualPayment/>} />
         <Route path="/verify" element={<VerifyPage />} />
         <Route path="/my-orders" element={<MyOrders />} />
+        <Route path="/my-account" element={<AccountDetail />} />
         <Route path="/order" element={
           <ProtectedRoute>
             <PlaceOrder />
