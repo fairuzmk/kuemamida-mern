@@ -210,6 +210,7 @@ const handlePhoneChange = (e) => {
                     setCfToken(token);}}
                 />
               <button type="button" onClick={handleSendOtp} disabled={loading || !cfToken} >
+                {cfToken ? "Selanjutnya" : "Loading Captcha.."}
                 {loading ? "Mengirim OTP..." : "Selanjutnya"}
               </button>
 
