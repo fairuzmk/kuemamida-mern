@@ -202,13 +202,15 @@ const handlePhoneChange = (e) => {
               placeholder="Ex. 081123212321"
               required
                 />
-
+              <div className='captcha-box'>
                <Turnstile
                   siteKey="0x4AAAAAABqlW_kzRn-ubIz3"
+                  options={{ appearance: "always" }}
                   onSuccess={(token) => {
                     
                     setCfToken(token);}}
                 />
+                </div>
               <button type="button" onClick={handleSendOtp} disabled={loading || !cfToken} >
                 {cfToken ? <> {loading ? "Mengirim OTP..." : "Selanjutnya"} </> : "Loading Captcha.."}
                 

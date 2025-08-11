@@ -187,3 +187,9 @@
     font-weight: 500;
     cursor: pointer;
 }
+
+
+.captcha-box{
+  width: 100%;
+  text-align: center;
+}
