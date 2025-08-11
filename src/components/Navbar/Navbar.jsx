@@ -90,8 +90,8 @@ const Navbar = ({setShowLogin}) => {
         {/* SOCIAL ICONS AT BOTTOM */}
         <div className="sidebar-social">
           <ul>
-            <li ><FontAwesomeIcon icon={faWhatsapp} className="svg-sidebar-icon" />Whatsapp</li>
-            <li ><FontAwesomeIcon icon={faInstagram} className="svg-sidebar-icon" />Follow us</li>
+            <li onClick={() => { window.location.href = "https://wa.me/6287888624508"; setMenu("home"); setShowSidebar(false); }}><FontAwesomeIcon icon={faWhatsapp} className="svg-sidebar-icon" />Whatsapp</li>
+            <li onClick={() => { window.location.href = "https://instagram.com/kue.mamida"; setMenu("home"); setShowSidebar(false); }}><FontAwesomeIcon icon={faInstagram} className="svg-sidebar-icon" />Follow us</li>
             
             {!token
             ?<li onClick={() => { setShowLogin(true); setShowSidebar(false); }}>

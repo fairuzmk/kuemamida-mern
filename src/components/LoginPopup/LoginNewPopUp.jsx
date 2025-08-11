@@ -16,7 +16,7 @@ const LoginNewPopup = ({ setShowLogin }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(0); // detik
   const [resendTimer, setResendTimer] = useState(0);
-
+const [displayPhone, setDisplayPhone] = useState("");
   const [data, setData] = useState({
     name: "",
     email: "",
@@ -29,6 +29,21 @@ const LoginNewPopup = ({ setShowLogin }) => {
     const { name, value } = event.target;
     setData(prev => ({ ...prev, [name]: value }));
   };
+
+
+const handlePhoneChange = (e) => {
+  let value = e.target.value.replace(/\D/g, ""); // hapus non angka
+  setDisplayPhone(value);
+
+  let numeric = value;
+  if (numeric.startsWith("0")) {
+    numeric = "62" + numeric.slice(1);
+  }
+  setData((prev) => ({
+    ...prev,
+    phone: numeric,
+  }));
+};
 
   // REGISTER / LOGIN EMAIL
   const onLoginEmail = async (event) => {
@@ -165,12 +180,13 @@ const LoginNewPopup = ({ setShowLogin }) => {
       
             {!otpSent ? (
               <>
+            <label>Nomor Whatsapp</label>
             <input
               type="text"
               name="phone"
-              onChange={onChangeHandler}
-              value={data.phone}
-              placeholder="No HP Kamu"
+              onChange={handlePhoneChange}
+              value={displayPhone}
+              placeholder="Contoh : 081123212321"
               required
                 />
               <button type="button" onClick={handleSendOtp} disabled={loading}>

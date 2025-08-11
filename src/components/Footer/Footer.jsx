@@ -21,14 +21,14 @@ const Footer = () => {
               <span className="circle-social">
                 <FontAwesomeIcon icon={faWhatsapp} className="svg-social-icon" />
               </span>
-              <a className="social-label" href=''>Chat us on WhatsApp</a>
+              <a className="social-label" href='https://wa.me/6287888624508'>Chat us on WhatsApp</a>
             </div>
 
             <div className="social-item">
               <span className="circle-social">
                 <FontAwesomeIcon icon={faInstagram} className="svg-social-icon" />
               </span>
-              <a className="social-label" href="">Follow us on Instagram</a>
+              <a className="social-label" href="https://instagram.com/kue.mamida">Follow us on Instagram</a>
             </div>
           </div>
         </div>
