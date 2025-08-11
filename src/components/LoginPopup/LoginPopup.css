@@ -104,7 +104,7 @@
     display: flex;
     justify-content: center;
     gap: 2px;
-    margin-bottom: 1rem;
+    margin-bottom: 1px;
     overflow: hidden;
   }
   
@@ -150,4 +150,40 @@
   .otp-timer{
     text-align: center;
   }
+
+  .input-nomor-wa{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+  }
+  
+  .input-nomor-wa label{
+    font-size: 15px;
+    font-weight: 700;
+    color: black;
+    text-align: center;
+
+  }
+
+  .input-nomor-wa input{
+    font-size: 15px;
+    color: #5a5a5a;
+    margin-bottom: 15px;
+  }
+
+  .login-icon{
+    font-size: 50px;
+    text-align: center;
+    color: #00aa5b;
+
+  }
  
+  .login-otp-question{
+    text-align: center;
+  }
+  .login-otp-question span{
+    color: var(--primary-color);
+    font-weight: 500;
+    cursor: pointer;
+}

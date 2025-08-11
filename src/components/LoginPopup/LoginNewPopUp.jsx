@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import './LoginPopup.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { FaWhatsapp } from "react-icons/fa";
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { StoreContext } from '../../context/StoreContext';
 import axios from 'axios';
@@ -10,7 +11,7 @@ const LoginNewPopup = ({ setShowLogin }) => {
 
 
   const [currState, setCurrState] = useState("Login"); // Login | Sign Up
-  const [loginMethod, setLoginMethod] = useState("email"); // email | phone
+  const [loginMethod, setLoginMethod] = useState("phone"); // email | phone
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -95,7 +96,7 @@ const handlePhoneChange = (e) => {
         await sendOtp(); // call API
         setLoading(false);
         setOtpSent(true);
-        setTimer(300); // 5 menit
+        setTimer(600); // 5 menit
         setResendTimer(60); // 1 menit
       };
     
@@ -152,11 +153,11 @@ const handlePhoneChange = (e) => {
 
         {/* Pilihan metode login */}
         <div className="login-method-toggle">
-          <a onClick={() => setLoginMethod("email")} className={loginMethod === "email" ? "active" : ""}>
-            Login with Email
-          </a>
           <a onClick={() => setLoginMethod("phone")} className={loginMethod === "phone" ? "active" : ""}>
-            Login with WA
+            Whatsapp
+          </a>
+          <a onClick={() => setLoginMethod("email")} className={loginMethod === "email" ? "active" : ""}>
+            Email Login
           </a>
         </div>
 
@@ -179,31 +180,30 @@ const handlePhoneChange = (e) => {
             
       
             {!otpSent ? (
-              <>
+            <div className='input-nomor-wa'>
+            <div className='login-icon'><FaWhatsapp /></div>
             <label>Nomor Whatsapp</label>
             <input
               type="text"
               name="phone"
               onChange={handlePhoneChange}
               value={displayPhone}
-              placeholder="Contoh : 081123212321"
+              placeholder="Ex. 081123212321"
               required
                 />
               <button type="button" onClick={handleSendOtp} disabled={loading}>
-                {loading ? "Mengirim..." : "Kirim OTP"}
+                {loading ? "Mengirim OTP..." : "Selanjutnya"}
               </button>
-              </>
+
+              </div>
             ) : (
               <>
-                <div className='login-popup-question'>
-                <p>OTP sudah dikirim ke nomor <span>{data.phone}</span>. Belum Menerima OTP?   
-               
-                
-                  {resendTimer > 0
-                    ? ` Kirim ulang OTP setelah (${resendTimer}s)`
-                    : 
-                    <span className="" onClick={handleSendOtp}> Kirim Ulang OTP </span>
-                  }
+                <div className='login-icon'><FaWhatsapp /></div>
+                <div className='login-otp-question'>
+                <p>OTP sudah dikirim ke nomor <span>{data.phone}</span>. Segera verifikasi OTP anda <span className="otp-timer">
+                  OTP berlaku {Math.floor(timer / 60)}:
+                  {String(timer % 60).padStart(2, "0")}
+                </span>
                 </p>
                 </div>
                 <div className="otp-input-group">
@@ -219,11 +219,15 @@ const handlePhoneChange = (e) => {
                   ))}
                 </div>
       
-                <p className="otp-timer">
-                  OTP berlaku {Math.floor(timer / 60)}:
-                  {String(timer % 60).padStart(2, "0")}
-                </p>
-      
+                
+                <div className='login-otp-question'>
+                Belum Menerima OTP?   
+                      {resendTimer > 0
+                        ? ` Kirim ulang OTP setelah (${resendTimer}s)`
+                        : 
+                        <span onClick={handleSendOtp}> Kirim Ulang OTP </span>
+                      }
+               </div>
                 <button type="button" onClick={handleVerifyOtp}>
                   Verifikasi OTP
                 </button>
@@ -241,18 +245,23 @@ const handlePhoneChange = (e) => {
 
           {/* Checkbox syarat */}
           {currState === "Sign Up" && loginMethod === "email" && (
+            <>
             <div className="login-popup-condition">
               <input type="checkbox" required />
               <p>By continuing, I agree to the terms of use & privacy policy</p>
             </div>
+            <div className="login-popup-question">
+            <p>Already have an account? <span onClick={() => setCurrState("Login")}>Login here</span></p>
+            </div>
+            </>
           )}
 
           {/* Switch Login / Sign Up */}
           <div className="login-popup-question">
-            {currState === "Login" ? (
+            {currState === "Login" & loginMethod === "email" ? (
               <p>Create a new account? <span onClick={() => setCurrState("Sign Up")}>Click here</span></p>
             ) : (
-              <p>Already have an account? <span onClick={() => setCurrState("Login")}>Login here</span></p>
+              <></>
             )}
           </div>
         </div>
