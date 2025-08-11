@@ -206,7 +206,7 @@ const handlePhoneChange = (e) => {
                <Turnstile
                   siteKey="0x4AAAAAABqlW_kzRn-ubIz3"
                   onSuccess={(token) => {
-                    console.log("Captcha token:", token);
+                    
                     setCfToken(token);}}
                 />
               <button type="button" onClick={handleSendOtp} disabled={loading || !cfToken} >
