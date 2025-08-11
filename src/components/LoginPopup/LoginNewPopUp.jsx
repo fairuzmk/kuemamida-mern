@@ -5,6 +5,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { StoreContext } from '../../context/StoreContext';
 import axios from 'axios';
+import { Turnstile } from "@marsidev/react-turnstile";
 
 const LoginNewPopup = ({ setShowLogin }) => {
   const { url, setToken } = useContext(StoreContext);
@@ -25,6 +26,7 @@ const [displayPhone, setDisplayPhone] = useState("");
     password: "",
     otp: ""
   });
+  const [cfToken, setCfToken] = useState("");
 
   const onChangeHandler = (event) => {
     const { name, value } = event.target;
@@ -80,25 +82,34 @@ const handlePhoneChange = (e) => {
 
   // KIRIM OTP
   const sendOtp = async () => {
+
     if (!data.phone) return alert("Masukkan nomor HP");
-    const response = await axios.post(url + "/api/user-new/send-otp", { phone: data.phone });
+    if (!cfToken) return alert("Verifikasi captcha dulu");
+    const response = await axios.post(url + "/api/user-new/send-otp", { 
+      phone: data.phone, cfToken });
     if (response.data.success) {
       setOtpSent(true);
       alert("OTP dikirim ke WhatsApp");
+      return true;
     } else {
       alert(response.data.message);
+      return false;
     }
   };
 
     // Kirim OTP
     const handleSendOtp = async () => {
-        setLoading(true);
-        await sendOtp(); // call API
-        setLoading(false);
+      if (!cfToken) return alert("Verifikasi captcha dulu");
+      setLoading(true);
+      const ok = await sendOtp();
+      setLoading(false);
+      if (ok) {
         setOtpSent(true);
-        setTimer(600); // 5 menit
-        setResendTimer(60); // 1 menit
-      };
+        setTimer(600);
+        setResendTimer(60);
+      }
+    };
+    
     
 
       
@@ -191,7 +202,14 @@ const handlePhoneChange = (e) => {
               placeholder="Ex. 081123212321"
               required
                 />
-              <button type="button" onClick={handleSendOtp} disabled={loading}>
+
+               <Turnstile
+                  siteKey="0x4AAAAAABqlW_kzRn-ubIz3"
+                  onSuccess={(token) => {
+                    console.log("Captcha token:", token);
+                    setCfToken(token);}}
+                />
+              <button type="button" onClick={handleSendOtp} disabled={loading || !cfToken} >
                 {loading ? "Mengirim OTP..." : "Selanjutnya"}
               </button>
 
