@@ -66,6 +66,30 @@
     margin-bottom: 8px
   }
   
+  .food-item-img-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+  .out-of-stock-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6); /* semi transparan hitam */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    z-index: 2;
+    backdrop-filter: blur(2px);
+    border-radius: 15px 15px 0px 0px;
+  }
+
   @media (max-width: 600px) {
     .food-item {
       height: 275px;

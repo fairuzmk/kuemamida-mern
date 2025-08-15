@@ -52,7 +52,13 @@ const FoodItem = ({ id, name, price, varians, image, rating, inStock, category }
 
       <div className="food-item-info">
         <div className="food-item-name-rating">
-          <p onClick={() => navigate(`/detail/${slug}-${id}`)}>{name}</p>
+          {!inStock
+          ?<p>{name}
+          </p>
+          :<p 
+          onClick={() => navigate(`/detail/${slug}-${id}`)}>{name}
+          </p>
+          }
         </div>
 
         <div className="food-item-varian">
