@@ -21,7 +21,7 @@
 }
 
 .cart h1{
-    font-size: 30px;
+    font-size: 25px;
     margin-bottom: 30px;
     color: var(--primary-color);
 }
@@ -308,7 +308,7 @@
     
     .cart-total-float{
         position: fixed;
-        bottom: 0;
+        bottom:60px;
         left: 0;
         width: 100%;
         background: white;

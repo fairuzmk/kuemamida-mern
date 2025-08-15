@@ -64,7 +64,7 @@ export default function AccountDetail() {
     <>
     <div className="account-detail-container">
         
-      <h2>Account Detail</h2>
+      <h1>Account Detail</h1>
 
       {message && <p className="message">{message}</p>}
 

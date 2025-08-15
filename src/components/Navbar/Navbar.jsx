@@ -1,15 +1,18 @@
 import React, { useContext, useEffect, useState } from 'react'
 import './Navbar.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faB, faCartShopping } from '@fortawesome/free-solid-svg-icons';
+import { faCartShopping, } from '@fortawesome/free-solid-svg-icons';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import { faBars, faXmark, faRightToBracket, faUser, faBagShopping, faCircleUser, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faXmark, faRightToBracket, faUser, faBagShopping, faCircleUser, faRightFromBracket, faHouse } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faInstagram, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { StoreContext } from '../../context/StoreContext';
 import axios from 'axios';
+import "./BottomNavMobile.css";
+
 library.add(faInstagram);
+
 
 const Navbar = ({setShowLogin}) => {
 
@@ -60,6 +63,7 @@ const Navbar = ({setShowLogin}) => {
 
 
   return (
+    <>
   <div className={`navbar ${scrolled ? 'scrolled' : ''}`}>
 
     {/* HAMBURGER ICON */}
@@ -100,8 +104,6 @@ const Navbar = ({setShowLogin}) => {
             <>
             <li onClick={() => { setShowSidebar(false); }}>
             <FontAwesomeIcon icon={faUser} className="svg-sidebar-icon" />Hai, {user.name}</li>
-            <li onClick={() => { setShowSidebar(false); }}>
-            <FontAwesomeIcon icon={faBagShopping} className="svg-sidebar-icon" />Your Order</li>
             <li onClick={() => { setShowLogin(false); setShowSidebar(false); }}>
             <FontAwesomeIcon icon={faRightFromBracket} className="svg-sidebar-icon" />Sign Out</li>
             </>
@@ -114,28 +116,30 @@ const Navbar = ({setShowLogin}) => {
     <div className="navbar-right">
 
         <div className="navbar-search-icon">
-        <div><FontAwesomeIcon icon={faMagnifyingGlass} 
-        className="svg-navbar-icon"
-        /></div>
-        <div> 
-          <Link to="/cart"><FontAwesomeIcon
-              icon={faCartShopping}
-              
-              className="svg-navbar-icon"
-              
-            /></Link>
-        </div>
+          <div><FontAwesomeIcon icon={faMagnifyingGlass} 
+          className="svg-navbar-icon"
+          /></div>
+
+          <div className='cart-icon-wrapper'> 
+            <Link to="/cart"><FontAwesomeIcon
+                icon={faCartShopping}
+                
+                className="svg-navbar-icon"
+                
+              /></Link>
+            <div className={getTotalCartAmount()===0?"":"dot"}>
+
+            </div>
+          </div>
          
-        <div className={getTotalCartAmount()===0?"":"dot"}>
           
-        </div>
         </div>
 
         {!token
         ?<button onClick={()=>setShowLogin(true)}>Sign In</button>
         :
         <div className="navbar-profile">
-          <FontAwesomeIcon icon={faCircleUser} 
+          <FontAwesomeIcon icon={faUser} 
               className="svg-navbar-icon"
         />
         <ul className="nav-profile-dropdown">
@@ -157,7 +161,52 @@ const Navbar = ({setShowLogin}) => {
        }
         
     </div>
+    
   </div>
+        <div className="bottom-nav-mobile">
+          
+          <Link to="/">
+            <FontAwesomeIcon icon={faBars} onClick={() => setShowSidebar(prev => !prev)}className='bottom-nav-icon'/>
+            <span>Menu</span>
+          </Link>
+          
+          <Link to="/cart">
+            <div className="cart-icon-navbot">
+            <FontAwesomeIcon icon={faCartShopping} className='bottom-nav-icon' />
+            
+            <div className={getTotalCartAmount()===0?"":"dot"}></div>
+
+            </div>
+            <span>Cart</span>
+          </Link>
+          
+          <Link to="/">
+            <FontAwesomeIcon icon={faHouse} className='bottom-nav-icon'/>
+            <span>Home</span>
+          </Link>
+          <Link to="/my-orders">
+            <FontAwesomeIcon icon={faBagShopping} className='bottom-nav-icon'/>
+            <span>Order</span>
+          </Link>
+          
+          {!token
+            ?
+            <Link>
+            <FontAwesomeIcon icon={faRightToBracket} onClick={() => { setShowLogin(true); setShowSidebar(false); }} className='bottom-nav-icon'/>
+
+            <span>Sign In</span>
+            </Link>
+            :
+            
+            <Link to="/my-account">
+            <FontAwesomeIcon icon={faUser} className='bottom-nav-icon'/>
+            <span>Account</span>
+            </Link>
+            
+            }
+          
+        </div>
+  </>
   )
 }
 

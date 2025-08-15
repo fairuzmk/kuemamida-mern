@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react'
 import './PlaceOrder.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faCreditCard } from '@fortawesome/free-solid-svg-icons';
+import {faCreditCard, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
 import { StoreContext } from '../../context/StoreContext'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { FaMoneyBill, FaMoneyCheck, FaTruck } from 'react-icons/fa';
 
 
 
@@ -16,19 +17,39 @@ import { useNavigate } from 'react-router-dom';
 const PlaceOrder = () => {
   const navigate = useNavigate();
 
-  const {getTotalCartAmount, quantityItem, cartItems, food_list, url, options, fetchOptions, setCartItems} = useContext(StoreContext);
+  const {getTotalCartAmount, quantityItem, cartItems, food_list, url, options, fetchOptions, setCartItems, token} = useContext(StoreContext);
+
+   const [user, setUser] = useState({ name: "", address: "", phone:"" });
 
   useEffect(() => {
     fetchOptions();
   }, []);
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`${url}/api/user-new/account`, {
+          headers: { token }
+        });
+        if (res.data.success) {
+          setUser(res.data.user);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        
+      }
+    };
+    fetchUser();
+  }, [token]);
+
   const [isLoading, setIsLoading] = useState(false);
   const [selectedShipping, setSelectedShipping] = useState( {value: "", label: "", price: 0});
   const [payment_method, setPaymentMethod] = useState({ value: "" });
 
-  const [name, setName] = useState('');
+
   const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
+
 
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
@@ -82,9 +103,9 @@ const PlaceOrder = () => {
       shipping_method: selectedShipping.value,
       payment_method: payment_method.value,
       address: {
-        name,
-        phone,
-        detail: address,
+        name:user.name,
+        phone: user.phone,
+        detail: user.address,
       }
     };
   
@@ -106,6 +127,12 @@ const PlaceOrder = () => {
       setIsLoading(false); // selesai loading
     }
   };
+
+  const paymentMethod = [
+    { value: "Transfer", label: "Transfer Bank", icon: <FaMoneyCheck /> },
+    { value: "COD", label: "Bayar di tempat", icon: <FaMoneyBill /> }
+  ];
+
   
 
   return (
@@ -114,67 +141,57 @@ const PlaceOrder = () => {
         <p className="title">Informasi Pengiriman</p>
         
         <div className="multi-fields">
+        <h4 className="label">Nama Pemesan</h4>
         <input
             required
             type="text"
             placeholder='Nama Penerima'
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={user.name}
+            onChange={(e) => setUser(prev => ({ ...prev, name: e.target.value }))}
           />
         </div>
+        <h4 className="label">Nomor HP</h4>
         <input
             type="text"
             placeholder='Nomor HP (Whatsapp)'
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            value={user.phone}
+            onChange={(e) => setUser(prev => ({ ...prev, phone: e.target.value }))}
           />
 
-        <div className="form-select">
-          
-          <select
-            required
-            placeholder="Pilih Metode Pengiriman"
-            value={payment_method.value}
-            onChange={(e) => setPaymentMethod({ value: e.target.value })}
-            
-          >
-            <option value="" disabled>
-              Pilih Metode Pembayaran
-            </option>
-            <option value="Transfer">Transfer</option>
-            <option value="COD">COD (Bayar di Tempat)</option>
-            
-          </select>
+        {/* Metode Pembayaran */}
+          <div className="payment-method">
+            <h4 className="label">Pilih Metode Pembayaran</h4>
+            <div className="radio-group">
+              {paymentMethod.map((method) => (
+                <label
+                  key={method.value}
+                  className={`radio-card ${
+                    payment_method.value === method.value ? "active" : ""
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="payment"
+                    value={method.value}
+                    checked={payment_method.value === method.value}
+                    onChange={() => setPaymentMethod({ value: method.value })}
+                  />
+                  <div className="icon">{method.icon}</div>
+                  <span className="method-label">{method.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
 
-
-        </div>
-        <div className="form-select">
-          
-          <select
-            required
-            placeholder="Pilih Metode Pengiriman"
-            value={selectedShipping.value}
-            onChange={(e) => {
-              const selected = options.shipping.find(opt => opt.value === e.target.value);
-              if (selected) setSelectedShipping(selected);
-            }}
-          >
-            <option value="" disabled>
-              Pilih Metode Pengiriman
-            </option>
-            {options.shipping.map((option) => (
-              <option key={option.value} value={option.value}>
-              {option.label} - Rp{option.price ? option.price.toLocaleString("id-ID") : 0}
-              </option>
-            ))}
-          </select>
-
-
-        </div>
+          {/* Metode Pengiriman */}
+          <h4 className="label">Pilih Metode Pengiriman</h4>
+          <div className="form-select"> <select required placeholder="Pilih Metode Pengiriman" value={selectedShipping.value} onChange={(e) => { const selected = options.shipping.find(opt => opt.value === e.target.value); if (selected) setSelectedShipping(selected); }} > <option value="" disabled> Pilih Metode Pengiriman </option> {options.shipping.map((option) => ( <option key={option.value} value={option.value}> {option.label} - Rp{option.price ? option.price.toLocaleString("id-ID") : 0} </option> ))} </select> </div>
+        
+          <h4 className="label">Alamat Lengkap</h4>
         <textarea
           placeholder='Alamat Lengkap'
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
+          value={user.address}
+          onChange={(e) => setUser({ ...user, address: e.target.value })}
         />
       </div>
       <div className="place-order-right">

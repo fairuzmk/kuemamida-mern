@@ -22,7 +22,7 @@ const FoodDisplay = ({ category }) => {
 
   return (
     <div className='food-display' id='food-display'>
-      <h2>Top Dishes Near You</h2>
+      
       <div className="food-display-list">
         {currentItems.map((item) => (
           <FoodItem

@@ -21,7 +21,7 @@
     backdrop-filter: blur(12px);
     padding: 10px 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transform: translateY(0);
+    transition: all 0.3s ease; /* tetap kasih transisi halus */
   }
 
 .hamburger {
@@ -185,16 +185,22 @@ cursor: pointer;
     
 }
 
-.navbar-search-icon .dot {
+.cart-icon-wrapper {
+    position: relative; /* supaya dot posisinya relatif ke wrapper ini */
+    display: inline-block;
+  }
+  
+  .cart-icon-wrapper .dot {
     position: absolute;
     min-width: 10px;
     min-height: 10px;
     background-color: var(--primary-color);
-    border-radius: 5px;
-    top:-4px;
+    border-radius: 50%;
+    top: -4px;
     right: -4px;
+  }
 
-}
+
 
 .navbar-profile {
     position: relative;
@@ -370,9 +376,7 @@ cursor: pointer;
     }
 
     .navbar-search-icon{
-        
-        gap:0px;
-        margin-right: 2px;
+        display:none;
     }
    
     

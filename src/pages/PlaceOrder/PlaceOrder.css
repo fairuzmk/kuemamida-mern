@@ -86,6 +86,70 @@
   cursor: pointer;
 }
 
+.label{
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    margin-top: 0.75rem;
+}
+.payment-method {
+    margin-top: 1rem;
+  }
+  
+
+  .radio-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+  }
+  
+  .radio-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid #ddd;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+  
+  .radio-card input {
+    display: none;
+  }
+  
+  .radio-card .icon {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    color: #555;
+  }
+  
+  .radio-card .method-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  
+  .radio-card:hover {
+    border-color: #999;
+    background: #f9f9f9;
+  }
+  
+  .radio-card.active {
+    border-color: var(--primary-color);
+    background: #fff8e1;
+  }
+  
+  .radio-card.active .icon {
+    color: var(--primary-color);
+  }
+
+  .shipping-method{
+    margin-bottom: 10px;
+    margin-top: 10px;
+  
+  }
 @media (max-width: 750px) {
     .place-order{
         flex-direction: column;
