@@ -41,7 +41,8 @@ export default function AccountDetail() {
       const res = await axios.post(
         `${url}/api/user-new/account/update`,
         { name: user.name || "", 
-          address: user.address || "" },
+          address: user.address || "",
+          isVerified: true },
         { headers: { token } }
       );
       if (res.data.success) {
