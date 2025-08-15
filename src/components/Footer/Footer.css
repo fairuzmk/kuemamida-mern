@@ -189,6 +189,7 @@
 
 @media(max-width: 500px){
 
+   
       .footer-content-center{
         display:none;
     }
@@ -217,14 +218,33 @@
     padding: 20px 8vw;
     padding-top: 30px;
     margin-top: 30px;
+    margin-bottom: 60px;
     }
+
     .circle-social {
       width: 50px;
       height: 50px;
     }
 
     .footer-content-right{
-      display: none
+      display: none;
+  }
+
+  .footer-content-right h2{
+    display:none;
+  }
+
+  .contact-info {
+    padding: 10px;
+
+  }
+  
+  .contact-item {
+    margin-bottom:5px;
+  }
+
+  .contact-item span{
+    font-size: 15px;
   }
   .footer-copyright {
     font-size: 12px;

@@ -42,7 +42,7 @@ const Cart = () => {
                     <h3>{product.name} </h3>
                     <p>{variant ? `Varian: ${variant.varianName}` : ''}</p>
                     <p>{qty} x {price.toLocaleString("id-ID")}</p>
-
+                    <p>Stock: {variant.varianStock}</p>
                     <div className='item-counter-cart-wrapper'>
                       <div className="item-counter-cart">
                         <FontAwesomeIcon icon={faMinus} onClick={() => removeFromCart(itemKey)} />
@@ -57,7 +57,7 @@ const Cart = () => {
                     
                     <div className='cart-items-item-details'>
                     <p>Rp. {(price * qty).toLocaleString("id-ID")}</p>
-                    <p>Stock: {variant.varianStock}</p>
+                    
                     
                     
                     </div>

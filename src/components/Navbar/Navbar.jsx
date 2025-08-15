@@ -166,7 +166,7 @@ const Navbar = ({setShowLogin}) => {
   
         <div className="bottom-nav-mobile">
           
-          <Link to="/">
+          <Link>
             <FontAwesomeIcon icon={faBars} onClick={() => setShowSidebar(prev => !prev)}className='bottom-nav-icon'/>
             <span>Menu</span>
           </Link>
