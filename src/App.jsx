@@ -14,7 +14,7 @@ import VerifyPage from './pages/Payments/VerifyPage'
 import MyOrders from './pages/MyOrders/MyOrders'
 import LoginNewPopup from './components/LoginPopup/LoginNewPopUp'
 import AccountDetail from './pages/AccountDetails/AccountDetail'
-import BottomNavMobile from './components/Navbar/BottomNavMobile'
+
 
 const App = () => {
 

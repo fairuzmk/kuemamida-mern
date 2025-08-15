@@ -163,6 +163,7 @@ const Navbar = ({setShowLogin}) => {
     </div>
     
   </div>
+  
         <div className="bottom-nav-mobile">
           
           <Link to="/">
