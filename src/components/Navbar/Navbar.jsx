@@ -114,16 +114,21 @@ const Navbar = ({setShowLogin}) => {
     <div className="navbar-right">
 
         <div className="navbar-search-icon">
-        <FontAwesomeIcon icon={faMagnifyingGlass} 
+        <div><FontAwesomeIcon icon={faMagnifyingGlass} 
         className="svg-navbar-icon"
-        />
+        /></div>
+        <div> 
           <Link to="/cart"><FontAwesomeIcon
               icon={faCartShopping}
               
               className="svg-navbar-icon"
               
             /></Link>
-        <div className={getTotalCartAmount()===0?"":"dot"}></div>
+        </div>
+         
+        <div className={getTotalCartAmount()===0?"":"dot"}>
+          
+        </div>
         </div>
 
         {!token
