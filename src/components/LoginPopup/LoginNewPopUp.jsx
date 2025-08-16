@@ -175,14 +175,19 @@ const handlePhoneChange = (e) => {
         <div className="login-popup-inputs">
           {/* Sign Up Name */}
           {currState === "Sign Up" && loginMethod === "email" && (
+            <>
             <input name="name" onChange={onChangeHandler} value={data.name} type="text" placeholder="Nama Kamu" required />
-            
+            <input type="text" name="phone" onChange={onChangeHandler} value={data.phone} placeholder="No HP" required />
+            </>
           )}
 
           {loginMethod === "email" && (
             <>
+              
               <input type="email" name="email" onChange={onChangeHandler} value={data.email} placeholder="Email Kamu" required />
+
               <input type="password" name="password" onChange={onChangeHandler} value={data.password} placeholder="Password" required />
+              
             </>
           )}
 
