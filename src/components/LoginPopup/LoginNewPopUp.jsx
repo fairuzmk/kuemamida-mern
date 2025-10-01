@@ -6,6 +6,7 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { StoreContext } from '../../context/StoreContext';
 import axios from 'axios';
 import { Turnstile } from "@marsidev/react-turnstile";
+import { toast, ToastContainer } from 'react-toastify';
 
 const LoginNewPopup = ({ setShowLogin }) => {
   const { url, setToken } = useContext(StoreContext);
@@ -89,7 +90,7 @@ const handlePhoneChange = (e) => {
       phone: data.phone, cfToken });
     if (response.data.success) {
       setOtpSent(true);
-      alert("OTP dikirim ke WhatsApp");
+      toast.success("OTP dikirim ke WhatsApp");
       return true;
     } else {
       alert(response.data.message);
@@ -291,6 +292,7 @@ const handlePhoneChange = (e) => {
             )}
           </div>
         </div>
+        <ToastContainer position="bottom-center" autoClose={2000} />
       </form>
     </div>
   );

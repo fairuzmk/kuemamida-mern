@@ -67,7 +67,7 @@ const VerifyPage = () => {
 
   const handleCopyNominal = async () => {
     try {
-      await navigator.clipboard.writeText(order.amount + order.shipping_fee);
+      await navigator.clipboard.writeText(order.amount + order.shipping_fee - order.payment_record);
       
       toast.success("Nominal berhasil disalin!");
     } catch (err) {
@@ -119,6 +119,10 @@ const VerifyPage = () => {
           : ( 
           <>
           <p className='total-order-verif'><strong>Total:</strong> Rp{(order.amount + order.shipping_fee).toLocaleString("id-ID")}</p>
+          {order.payment_record < (order.amount+order.shipping_fee)
+          ? <p className='total-order-verif'>Sisa Pembayaran : Rp. {((order.amount + order.shipping_fee) - order.payment_record).toLocaleString("id-ID")}</p>
+          : <p className='total-order-verif'>LUNAS</p>
+          }
           <p style={{ marginTop: '1rem', fontStyle: 'italic' }}>
             Silakan transfer via bank BCA dengan detail sebagai berikut :
           </p>
@@ -140,7 +144,7 @@ const VerifyPage = () => {
               <tr>
                 <td>Nominal</td>
                 <td>:</td>
-                <td className='total-order-verif'>Rp {(order.amount + order.shipping_fee).toLocaleString("id-ID")}</td>
+                <td className='total-order-verif'>Rp {(order.amount + order.shipping_fee - order.payment_record).toLocaleString("id-ID")}</td>
               </tr>
               </tbody>
             </table>
