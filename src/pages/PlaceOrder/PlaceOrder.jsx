@@ -17,7 +17,7 @@ import { FaMoneyBill, FaMoneyCheck, FaTruck } from 'react-icons/fa';
 const PlaceOrder = () => {
   const navigate = useNavigate();
 
-  const {getTotalCartAmount, quantityItem, cartItems, food_list, url, options, fetchOptions, setCartItems, token} = useContext(StoreContext);
+  const {getTotalCartAmount, quantityItem, cartItems, food_list, url, options, fetchOptions, setCartItems, token, cartBundles} = useContext(StoreContext);
 
    const [user, setUser] = useState({ name: "", address: "", phone:"" });
 
@@ -81,23 +81,22 @@ const PlaceOrder = () => {
         const varianIndex = product.varians?.findIndex(v => v.varianName === variant);
 
         return {
+          type: "single",
           _id: selectedVar ? `${productId}_${varianIndex}` : productId,
-          itemId: productId,
-          name: product.name,
           quantity: qty,
-          price: selectedVar ? selectedVar.varianPrice : product.price,
-          variant: selectedVar?.varianName || null,
         };
       })
       .filter(item => item !== null);
   
-    if (items.length === 0) {
+      const bundleItems = (cartBundles || []).map(({ _key, id, ...b }) => b);
+      const allItems = [...items, ...bundleItems];
+    if (allItems.length === 0) {
       alert("Tidak ada item valid di keranjang.");
       return;
     }
   
     const payload = {
-      items,
+      items: allItems,
       amount: getTotalCartAmount(),
       shipping_fee: selectedShipping.price,
       shipping_method: selectedShipping.value,

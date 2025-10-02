@@ -9,11 +9,14 @@ export const StoreContext = createContext(null)
 const StoreContextProvider = (props) => {
 
     const [cartItems, setCartItems] = useState({});
+    const [cartBundles, setCartBundles] = useState(() => {
+        try { return JSON.parse(localStorage.getItem("cartBundles")) || []; } catch { return []; }
+      });
 
     // const url = "https://kuemamida-backend.onrender.com";
     
-    const url = "https://kuemamida.milkioserver.my.id";
-    // const url = "http://localhost:4000";
+    // const url = "https://kuemamida.milkioserver.my.id";
+    const url = "http://localhost:4000";
     const [token, setToken] = useState(() => {
         return localStorage.getItem("token") || "";
     });
@@ -174,6 +177,10 @@ const StoreContextProvider = (props) => {
         loadData();
     },[])
 
+    useEffect(() => {
+        localStorage.setItem("cartBundles", JSON.stringify(cartBundles));
+      }, [cartBundles]);
+
     const quantityItem = () => {
         let quantity = 0;
         for (const item in cartItems){
@@ -186,8 +193,34 @@ const StoreContextProvider = (props) => {
         return quantity;
     }
 
+    const addBundleToCart = (bundlePayload) => {
+        const key = JSON.stringify({ bundleId: bundlePayload.bundleId, selections: bundlePayload.selections });
+        setCartBundles((prev) => {
+          const idx = prev.findIndex((b) => b._key === key);
+          if (idx >= 0) {
+            const next = [...prev];
+            next[idx] = { ...next[idx], quantity: (next[idx].quantity || 1) + (bundlePayload.quantity || 1) };
+            return next;
+          }
+          return [...prev, { ...bundlePayload, _key: key, id: String(Date.now()) }];
+        });
+      };
+    
+      const removeBundleFromCart = (id) => {
+        setCartBundles((prev) => prev.filter((b) => b.id !== id));
+      };
 
-
+      const incBundleQty = (id) => {
+        setCartBundles(prev => prev.map(b => b.id === id ? { ...b, quantity: (b.quantity || 1) + 1 } : b));
+      };
+      
+      const decBundleQty = (id) => {
+        setCartBundles(prev => prev.flatMap(b => {
+          if (b.id !== id) return [b];
+          const q = (b.quantity || 1) - 1;
+          return q > 0 ? [{ ...b, quantity: q }] : []; // kalau 0, hapus
+        }));
+      };
     const contextValue = {
         food_list,
         cartItems,
@@ -200,7 +233,12 @@ const StoreContextProvider = (props) => {
         token, 
         setToken,
         fetchOptions,
-        options
+        options,
+        cartBundles,
+        addBundleToCart,
+        removeBundleFromCart,
+        incBundleQty,        
+        decBundleQty,        
     }
 
 
