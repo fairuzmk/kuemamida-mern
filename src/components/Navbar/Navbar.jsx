@@ -76,7 +76,7 @@ const Navbar = ({setShowLogin}) => {
     <ul className="navbar-menu">
         <a href='/' onClick={()=>setMenu("home")} className={menu==="home"?"active":""}>Home</a>
         <a href="/#explore-menu" onClick={()=>setMenu("menu")} className={menu==="menu"?"active":""}>Menu</a>
-        <li onClick={()=>setMenu("lebaran")} className={menu==="lebaran"?"active":""}>Special Lebaran</li>
+        <Link to ="/eid-mubarak"><li onClick={()=>setMenu("lebaran")} className={menu==="lebaran"?"active":""}>Special Lebaran</li></Link>
         <Link to="/custom-cake"><li onClick={()=>setMenu("custom-order")} className={menu==="custom-order"?"active":""}>Custom Order</li></Link>
     </ul>
 
@@ -88,7 +88,7 @@ const Navbar = ({setShowLogin}) => {
         <ul>
           <li onClick={() => { window.location.href = "/"; setMenu("home"); setShowSidebar(false); }}>Home</li>
           <li onClick={() => { window.location.href = "/#explore-menu"; setMenu("menu"); setShowSidebar(false); }}>Menu</li>
-          <li onClick={() => { setMenu("lebaran"); setShowSidebar(false); }}>Special Lebaran</li>
+          <Link to ="/eid-mubarak"><li onClick={() => { setMenu("lebaran"); setShowSidebar(false); }}>Special Lebaran</li></Link>
           <Link to="/custom-cake"><li onClick={() => { setMenu("custom-order"); setShowSidebar(false); }}>Custom Order</li></Link>
         </ul>
         {/* SOCIAL ICONS AT BOTTOM */}

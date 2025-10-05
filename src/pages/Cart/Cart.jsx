@@ -47,7 +47,7 @@ const Cart = () => {
 
   const isCartEmpty = Object.values(cartItems).every(qty => qty === 0) && (!cartBundles || cartBundles.length === 0);
 
-  const bundlesSubtotal = Object.values(bundleAmounts).reduce((a, n) => a + (n || 0), 0);
+  
 
   return (
     <div className='cart'>
@@ -103,62 +103,70 @@ const Cart = () => {
               );
             })}
 
- {/* === Bundles / Hampers === */}
-{cartBundles && cartBundles.length > 0 && (
-  <>
-    <h3 style={{ marginTop: 12 }}>Paket Hampers</h3>
-    <hr />
-    {cartBundles.map((b) => {
-      const perBundleAmount = bundleAmounts[b.id] ?? null; // total harga bundle (sudah x quantity)
-      return (
-        <div key={b.id}>
-          <div className="cart-items-title cart-items-item">
-            {/* Thumbnail/ikon */}
-            <div style={{ width: 72, height: 72, background:"#f4f4f4", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center" }}>
-              🎁
-            </div>
+        {/* === Bundles / Hampers === */}
+            {cartBundles && cartBundles.length > 0 && (
+              <>
+                <h3 style={{ marginTop: 12 }}>Paket Hampers</h3>
+                <hr />
+                {(() => {
+                  // counter per bundleId
+                  const numbering = new Map();
+                  return cartBundles.map((b) => {
+                    const perBundleAmount = bundleAmounts[b.id] ?? null;
 
-            <div className='cart-items-item-description'>
-              <h3>Hampers #{String(b.bundleId).slice(-6)}</h3>
+                    const current = (numbering.get(b.bundleId) || 0) + 1;
+                    numbering.set(b.bundleId, current);
 
-              <ul style={{ margin: "6px 0 8px", paddingLeft: "18px" }}>
-                {b.selections.map((sel, i) => {
-                  const prod = food_list.find(p => p._id === sel.foodId);
-                  const vName = (sel.varianIndex != null && prod?.varians?.[sel.varianIndex]?.varianName)
-                    ? ` (${prod.varians[sel.varianIndex].varianName})` : "";
-                  return (
-                    <li key={i}>
-                      Slot {sel.slotIndex + 1}: {prod ? prod.name : sel.foodId}{vName}
-                    </li>
-                  );
-                })}
-              </ul>
+                    const displayName = `${b.name || "Hampers"} #${current}`;
 
-              {/* Counter qty di bawah detail (seperti cartItems) */}
-              <div className='item-counter-cart-wrapper'>
-                <div className="item-counter-cart">
-                  <button onClick={() => decBundleQty(b.id)}>-</button>
-                  <p>{b.quantity}</p>
-                  <button onClick={() => incBundleQty(b.id)}>+</button>
-                </div>
-              </div>
-            </div>
+                    return (
+                      <div key={b.id}>
+                        <div className="cart-items-title cart-items-item">
+                          <div className='hamper-image-box'>
+                            <img src={b.image} alt="" />
+                          </div>
 
-            {/* Harga di sisi kanan */}
-            <div className='cart-items-item-details'>
-              {perBundleAmount == null ? (
-                <p>menghitung...</p>
-              ) : (
-                <p>Rp. {perBundleAmount.toLocaleString("id-ID")}</p>
-              )}
-            </div>
-          </div>
-          <hr />
-        </div>
-      );
-    })}
-  </>
-)}  
+                          <div className='cart-items-item-description'>
+                            <h3>{displayName}</h3>
+
+                            <ul className='item-list-hampers'>
+                              {b.selections.map((sel, i) => {
+                                const prod = food_list.find(p => p._id === sel.foodId);
+                                const vName = (sel.varianIndex != null && prod?.varians?.[sel.varianIndex]?.varianName)
+                                  ? ` (${prod.varians[sel.varianIndex].varianName})` : "";
+                                return (
+                                  <li key={i}>
+                                    Item {sel.slotIndex + 1} : {prod ? prod.name : sel.foodId}{vName}
+                                  </li>
+                                );
+                              })}
+                            </ul>
+
+                            <div className='item-counter-cart-wrapper'>
+                              <div className="item-counter-cart">
+                              <FontAwesomeIcon icon={faMinus} onClick={() => decBundleQty(b.id)}/>
+                                <p>{b.quantity}</p>
+                                <FontAwesomeIcon icon={faPlus} onClick={() => incBundleQty(b.id)}/>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className='cart-items-item-details'>
+                            {perBundleAmount == null ? (
+                              <p>menghitung...</p>
+                            ) : (
+                              <p>Rp. {perBundleAmount.toLocaleString("id-ID")}</p>
+                            )}
+                          </div>
+                        </div>
+                        <hr />
+                      </div>
+                    );
+                  });
+                })()}
+              </>
+            )}
+
 
         
         </div>
@@ -166,7 +174,8 @@ const Cart = () => {
           <h2>Total Belanja</h2>
           <div className="cart-total-details">
             <p>Sub Total ( {quantityItem()} items ) </p>
-            <p>Rp {(getTotalCartAmount() + bundlesSubtotal).toLocaleString("id-ID")}</p>
+            {/* <p>Sub Total </p> */}
+            <p>Rp {(getTotalCartAmount()).toLocaleString("id-ID")}</p>
           </div>
           <hr />
           <div className="cart-total-details">
@@ -176,7 +185,7 @@ const Cart = () => {
           <hr />
           <div className="cart-total-details">
             <b>Total</b>
-            <p>Rp. {(getTotalCartAmount() + bundlesSubtotal).toLocaleString("id-ID")}</p>
+            <p>Rp. {(getTotalCartAmount()).toLocaleString("id-ID")}</p>
           </div>
           <div className='cart-total-button'>
           <button onClick={() => navigate('/order')}
@@ -209,7 +218,7 @@ const Cart = () => {
       <div className="cart-total-float">
         <div>
           <p>Total ({quantityItem()} items):</p>
-          <p>Rp. {(getTotalCartAmount() + bundlesSubtotal).toLocaleString("id-ID")}</p>
+          <p>Rp. {(getTotalCartAmount()).toLocaleString("id-ID")}</p>
         </div>
         <div className='cart-total-button'>
         <button

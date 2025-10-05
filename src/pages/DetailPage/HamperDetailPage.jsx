@@ -3,7 +3,8 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import "./HamperDetailPage.css";
 import { StoreContext } from "../../context/StoreContext";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function HamperDetailPage() {
   const { id } = useParams();
@@ -14,7 +15,7 @@ export default function HamperDetailPage() {
   const [selections, setSelections] = useState([]); // [{slotIndex, picks:[{foodId, varianIndex?}]}]
   const [previewAmount, setPreviewAmount] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const [adding, setAdding] = useState(false); // loading untuk tombol tambah ke keranjang
 
 
   // ambil detail hampers
@@ -81,9 +82,13 @@ export default function HamperDetailPage() {
     const payload = {
       type: "bundle",
       bundleId: hamper._id,
+      name: hamper.name,
+      image: hamper.image,
       quantity: Number(quantity) || 1,
       selections: [],
+
     };
+    
     for (const s of selections) {
       for (const p of s.picks) {
         if (!p.foodId) {
@@ -103,6 +108,10 @@ export default function HamperDetailPage() {
 
   // preview harga via backend
   const handlePreview = async () => {
+     if (!isComplete()) {
+         toast.warn("Harap isi paket terlebih dahulu");
+         return { ok: false };
+       }
     const bp = buildBundlePayload();
     if (!bp) return { ok: false };
     setLoading(true);
@@ -140,8 +149,13 @@ export default function HamperDetailPage() {
        else cur.push({ ...bp, _key: key, id: String(Date.now()) });
        localStorage.setItem("cartBundles", JSON.stringify(cur));
      };
+
   // tambah ke keranjang
   const handleAddToCart = async () => {
+     if (!isComplete()) {
+         toast.warn("Harap isi paket terlebih dahulu");
+         return;
+       }
     const bp = buildBundlePayload();
     if (!bp) return;
 
@@ -150,8 +164,15 @@ export default function HamperDetailPage() {
       const r = await handlePreview();
       if (!r?.ok) return;
     }
-    addToCartBundle(bp);
-    toast.success("Hampers ditambahkan ke keranjang");
+       try {
+           setAdding(true);
+           await Promise.resolve(addToCartBundle(bp)); // jaga-jaga kalau nanti async
+           toast.success("Hampers ditambahkan ke keranjang");
+         } catch (e) {
+           toast.error("Gagal menambahkan ke keranjang");
+         } finally {
+           setAdding(false);
+         }
   };
 
    const isComplete = () => {
@@ -168,6 +189,7 @@ export default function HamperDetailPage() {
 
   return (
     <div className="hamper-container">
+      <ToastContainer position="bottom-center" autoClose={3000} />
       <div className="hamper-image">
         {hamper.image ? (
           <img src={hamper.image} alt={hamper.name} />
@@ -180,33 +202,42 @@ export default function HamperDetailPage() {
         <h1 className="hamper-title">{hamper.name}</h1>
 
         <p className="hamper-price">
-          {hamper.pricingMode === "FIXED" ? (
+          { hamper.pricingMode === "FIXED" ? 
+          (
             <>Rp {Number(hamper.basePrice || 0).toLocaleString()} / paket</>
-          ) : (
+          ) : hamper.pricingMode === "SUM_MINUS_DISCOUNT" ?  (
             <>
               Harga dinamis: (jumlah harga item − diskon Rp{" "}
               {Number(hamper.discountAmount || 0).toLocaleString()})
             </>
-          )}
+            )
+           : hamper.pricingMode === "BASE_PLUS_ITEMS" ? (
+               <>
+                 (Harga item + Packaging Rp {Number(hamper.basePrice || 0).toLocaleString()} 
+                  {Number(hamper.discountAmount || 0) > 0 ? <> − diskon Rp {Number(hamper.discountAmount || 0).toLocaleString()}</> : null})
+               </>
+            )
+            : null
+            }
         </p>
 
-        <div className="hamper-qty">
-          <span>Jumlah Paket:</span>
-          <div className="qty-control">
-            <button onClick={() => setQuantity((q) => Math.max(1, q - 1))}>−</button>
-            <span>{quantity}</span>
-            <button onClick={() => setQuantity((q) => q + 1)}>+</button>
-          </div>
+        <div className="hamper-desc">
+          <p>{hamper.description || "-"}</p>
         </div>
 
         <div className="hamper-slots">
-          <h2>Pilih Isi Paket</h2>
+          <h3>Pilih Isi Paket</h3>
+          {!isComplete() && (
+            <div className="slot-warning">
+              Harap isi semua slot paket terlebih dahulu.
+            </div>
+          )}
           {(hamper.slots || []).map((slot, sIdx) => {
             const candidates = candidatesBySlot[sIdx] || [];
             return (
               <div key={sIdx} className="slot-card">
                 <div className="slot-head">
-                  <h3>{slot.name}</h3>
+                  <h4>{slot.name}</h4>
                   <small>pilih {slot.quantity} item</small>
                 </div>
 
@@ -220,7 +251,7 @@ export default function HamperDetailPage() {
                         value={pick.foodId || ""}
                         onChange={(e) => setPick(sIdx, pIdx, "foodId", e.target.value)}
                       >
-                        <option value="">-- pilih produk --</option>
+                        <option value="">-- Pilih Produk --</option>
                         {candidates.map((f) => (
                           <option key={f._id} value={f._id}>
                             {f.name}
@@ -269,16 +300,26 @@ export default function HamperDetailPage() {
           )}
         </div>
 
+        <div className="hamper-qty">
+          <span>Jumlah Paket:</span>
+          <div className="qty-control">
+            <button onClick={() => setQuantity((q) => Math.max(1, q - 1))}>−</button>
+            <span>{quantity}</span>
+            <button onClick={() => setQuantity((q) => q + 1)}>+</button>
+          </div>
+        </div>
+
         <div className="hamper-actions">
-        <button className="btn primary" disabled={!isComplete()} onClick={handleAddToCart}>
-            Tambah ke Keranjang
+         <button
+            className="btn primary"
+            disabled={!isComplete() || adding}
+            onClick={handleAddToCart}
+          >
+          {adding ? "Menambahkan..." : "Tambah ke Keranjang"}
           </button>
         </div>
 
-        <div className="hamper-desc">
-          <h2>Deskripsi</h2>
-          <p>{hamper.description || "-"}</p>
-        </div>
+        
       </div>
     </div>
   );

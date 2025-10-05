@@ -15,6 +15,7 @@ import MyOrders from './pages/MyOrders/MyOrders'
 import LoginNewPopup from './components/LoginPopup/LoginNewPopUp'
 import AccountDetail from './pages/AccountDetails/AccountDetail'
 import HamperDetailPage from './pages/DetailPage/HamperDetailPage'
+import LebaranMenu from './pages/LebaranMenu/LebaranMenu'
 
 
 const App = () => {
@@ -32,6 +33,7 @@ const App = () => {
         <Route path='/detail/:slugAndId' element={<DetailPage/>} />
         <Route path="/hampers/:id" element={<HamperDetailPage />} />
         <Route path='/cart' element={<Cart/>} />
+        <Route path='/eid-mubarak' element={<LebaranMenu/>} />
         <Route path='/payment' element={<ManualPayment/>} />
         <Route path="/verify" element={<VerifyPage />} />
         <Route path="/my-orders" element={<MyOrders />} />

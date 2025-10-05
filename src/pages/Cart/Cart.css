@@ -36,6 +36,20 @@
 
 }
 
+.item-list-hampers {
+    margin: 6px 0 8px;      /* atas 6px, kanan-kiri 0, bawah 8px */
+    padding-left: 18px;     /* beri indentasi bullet */
+    list-style: disc;       /* bullet standar */
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .item-list-hampers li {
+    margin: 2px 0;          /* spasi antar item */
+    line-height: 1.4;       /* keterbacaan */
+  }
+
+
 .cart-items-item img{
     width: 100px; 
 
@@ -386,5 +400,8 @@
         margin: 5px 0;
     }
     
+    .item-list-hampers{
+        font-size: 12px;
+    }
     
 }

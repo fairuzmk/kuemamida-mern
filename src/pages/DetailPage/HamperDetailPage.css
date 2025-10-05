@@ -1,53 +1,169 @@
 .hamper-container {
-    display: grid;
-    grid-template-columns: 1fr 1.1fr;
-    gap: 24px;
-    padding: 16px;
-  }
-  
-  .hamper-image {
-    border: 1px solid #eee;
-    border-radius: 8px;
-    padding: 12px;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 320px;
-    background: #fafafa;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    max-width: 1000px;
+    margin: auto;
   }
-  .hamper-image img { max-width: 100%; max-height: 100%; object-fit: contain; }
-  .no-image { color: #888; }
   
-  .hamper-details .hamper-title { font-size: 22px; margin: 0 0 8px; }
-  .hamper-price { font-weight: 600; margin-bottom: 12px; }
+ .hamper-image{
+  padding: 20px;
+  margin-right: 20px;
+
+
+ }
+  .hamper-image img {   
+    width: 100%;
+    height: auto;
+    border-radius: 8px; 
+    
+  }
+  .no-image { 
+    color: #888; 
+  }
   
-  .hamper-qty { display: flex; align-items: center; gap: 12px; margin: 12px 0; }
-  .qty-control { display: inline-flex; align-items: center; gap: 12px; }
+  .hamper-details .hamper-title 
+  { 
+    font-size: 22px; 
+    margin: 0 0 8px; 
+  }
+
+  .hamper-price { 
+    font-weight: 600; 
+    margin-bottom: 12px; 
+    color: var(--primary-color);
+    font-style: italic;
+  }
+  
+  .slot-warning {
+    margin: 12px 0;
+    padding: 10px 12px;
+    border: 1px solid #fecaca;   /* merah muda */
+    background: #fef2f2;         /* merah sangat muda */
+    color: #b91c1c;              /* merah */
+    border-radius: 8px;
+    font-weight: 600;
+  }
+
+  .hamper-qty { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    margin: 12px 0; }
+  .qty-control { 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 12px; }
+
   .qty-control button {
-    width: 32px; height: 32px; border-radius: 6px; border: 1px solid #ddd; background: #fff;
+    width: 32px; 
+    height: 32px; 
+    border-radius: 6px; 
+    border: 1px solid #ddd; 
+    background: #fff;
   }
-  .qty-control span { min-width: 24px; text-align: center; }
+  .qty-control span { 
+    min-width: 24px; 
+    text-align: center; }
   
-  .hamper-slots { margin-top: 16px; }
+  .hamper-slots { 
+    margin-top: 16px; 
+  }
+
+  .hamper-slots h3{
+    
+    margin-bottom: 8px;
+
+  }
+
   .slot-card {
-    border: 1px dashed #ddd; border-radius: 8px; padding: 12px; margin-bottom: 12px;
+    border: 1px dashed #ddd; 
+    border-radius: 8px; 
+    padding: 12px; 
+    margin-bottom: 12px;
   }
-  .slot-head { display: flex; align-items: baseline; gap: 8px; }
-  .slot-head h3 { margin: 0; }
-  .slot-row { display: flex; gap: 12px; align-items: center; margin-top: 8px; }
-  .slot-select { min-width: 220px; padding: 8px; }
-  .slot-price { color: #444; font-size: 14px; }
+  .slot-head { 
+    display: flex; 
+    align-items: baseline; 
+    gap: 8px; 
+  }
+
+  .slot-head h4 
+  { 
+    margin: 0; 
+    color: var(--primary-color);
+  }
+
+  .slot-row {
+    display: flex;
+    flex-direction: column;  /* <— dari row jadi column */
+    align-items: stretch;     /* full width */
+    gap: 10px;
+    margin-top: 8px;
+  }
   
-  .hamper-actions { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+  .slot-select {
+    width: 90%;              /* full width */
+    max-width: none;
+    min-width: 0;             /* override min-width sebelumnya */
+    padding: 8px;
+  }
+
+  .slot-price { 
+    color: #444; 
+    font-size: 14px; }
+  
+  .hamper-actions { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    margin-top: 12px; }
+
   .btn {
-    padding: 10px 14px; border: 1px solid #ddd; background: #fff; border-radius: 6px; cursor: pointer;
+    padding: 10px 14px; 
+    border: 1px solid #ddd; 
+    background: #fff; 
+    border-radius: 6px; 
+    cursor: pointer;
   }
-  .btn.primary { background: #2f7efd; color: #fff; border-color: #2f7efd; }
-  .preview-amount { font-weight: 600; }
+
+  .btn.primary { 
+    background: var(--primary-color); 
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600; 
+    }
+
+    .btn.primary:disabled { 
+      background: #3333; 
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600; 
+      }
+
+  .btn.primary:hover {
+    background-color: #fff;
+    color: var(--primary-color)
+  }
+  .preview-amount { 
+    font-weight: 600; 
+    color: var(--primary-color)
+  }
   
-  .hamper-desc { margin-top: 16px; }
-  .hamper-loading { padding: 16px; }
-  @media (max-width: 920px) {
-    .hamper-container { grid-template-columns: 1fr; }
+  .hamper-desc { 
+    margin-top: 16px; 
+  }
+  .hamper-loading { 
+    padding: 16px; 
+  }
+
+
+  @media (min-width: 768px) {
+    .hamper-container { flex-direction: row; }
+    
+    .hamper-image, .hamper-details {
+      flex:1;
+    }
   }
   

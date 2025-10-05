@@ -5,6 +5,7 @@ import menu_4 from './Menukuemamidacakepotong.png'
 import menu_5 from './Menukuemamidarisol.png'
 import menu_6 from './Menukuemamidakuekering.png'
 import menu_7 from './Menukuemamidasnackbox.png'
+import menu_8 from './eidmubarak.png'
 import coverImg from './brownies.png'
 
 export const menu_list = [
@@ -35,6 +36,20 @@ export const menu_list = [
     {
         menu_name: "Snack Box",
         menu_image: menu_7
+    }
+]
+
+export const menu_lebaran = [
+   
+    {
+        key: "Kue Kering",
+        label: "Kue Kering",
+        menu_image: menu_6
+    },
+    {
+        key: "Paket Hampers",
+        label: "Paket Hampers Lebaran",
+        menu_image: menu_8
     }
 ]
 

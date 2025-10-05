@@ -69,34 +69,44 @@ const PlaceOrder = () => {
     localStorage.setItem("cartItems", JSON.stringify(cleanedCartItems));
     setCartItems(cleanedCartItems); // <-- pakai ini kalau pakai useState
   
-    // Langkah 2: Buat payload hanya dari item valid
-    const items = Object.entries(cleanedCartItems)
+    // Langkah 2: Buat payload hanya dari item valid (produk biasa)
+      const items = Object.entries(cleanedCartItems)
       .map(([key, qty]) => {
-        const [productId, variant] = key.split('_');
+        const [productId, variantName] = key.split('_');
         const product = food_list.find(p => p._id === productId);
         if (!product) return null;
-  
-        const selectedVar = product.varians?.find(v => v.varianName === variant);
-  
-        const varianIndex = product.varians?.findIndex(v => v.varianName === variant);
+
+        // cari index varian numerik (biar backend bisa akses v[varianIndex])
+        const varianIndex = product.varians?.findIndex(v => v.varianName === variantName);
+        const hasVarian = typeof varianIndex === "number" && varianIndex >= 0;
 
         return {
           type: "single",
-          _id: selectedVar ? `${productId}_${varianIndex}` : productId,
+          productId,                          // <-- WAJIB: kirim ObjectId asli
           quantity: qty,
+          ...(hasVarian ? { varianIndex } : {}) // opsional; kirim hanya jika varian ada
         };
       })
-      .filter(item => item !== null);
+      .filter(Boolean);
   
-      const bundleItems = (cartBundles || []).map(({ _key, id, ...b }) => b);
-      const allItems = [...items, ...bundleItems];
-    if (allItems.length === 0) {
-      alert("Tidak ada item valid di keranjang.");
-      return;
-    }
-  
+      const bundles = (cartBundles || []).map(({ _key, id, ...b }) => ({
+        bundleId: b.bundleId,
+        name: b.name,
+        image: b.image,
+        quantity: b.quantity,
+        selections: b.selections,
+      }));
+      
+      if (items.length === 0 && bundles.length === 0) {
+        alert("Tidak ada item valid di keranjang.");
+        setIsLoading(false);
+        return;
+      }
+
+
     const payload = {
-      items: allItems,
+      items,                     // produk single
+      bundles,                   // paket hampers
       amount: getTotalCartAmount(),
       shipping_fee: selectedShipping.price,
       shipping_method: selectedShipping.value,

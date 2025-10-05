@@ -21,6 +21,18 @@
   background-color: #fff;
 }
 
+.order-lines {
+  margin: 6px 0 8px;
+  padding-left: 18px;
+}
+
+.order-bundle-items {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  opacity: 0.9;
+  font-size: 0.95em;
+}
+
 .order-id p{
   font-size: 14px;
 }

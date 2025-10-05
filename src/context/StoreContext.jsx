@@ -15,13 +15,15 @@ const StoreContextProvider = (props) => {
 
     // const url = "https://kuemamida-backend.onrender.com";
     
-    // const url = "https://kuemamida.milkioserver.my.id";
-    const url = "http://localhost:4000";
+    const url = "https://kuemamida.milkioserver.my.id";
+    // const url = "http://localhost:4000";
     const [token, setToken] = useState(() => {
         return localStorage.getItem("token") || "";
     });
 
     const [food_list, setFoodList] = useState([])
+    const [hampers, setHampers] = useState([]);
+    const [hampersPagination, setHampersPagination] = useState(null);
     
 
     const addToCart = async (itemKey) => {
@@ -83,22 +85,70 @@ const StoreContextProvider = (props) => {
         }
         };
 
-        
-        const getTotalCartAmount = () => {
-        let totalAmount = 0;
-        for (const itemKey in cartItems) {
-            if (cartItems[itemKey] > 0) {
-            const [id, varian] = itemKey.split('_');
-            const itemInfo = food_list.find((product) => product._id === id);
+        // Hitung subtotal 1 bundle (sudah x quantity bundle)
+        const getBundleSubtotal = (bundle, hampers, food_list) => {
+          if (!bundle) return 0;
+          const h = (hampers || []).find(x => String(x._id) === String(bundle.bundleId));
+          if (!h) return 0;
 
-            const varianPrice = itemInfo?.varians?.find(v => v.varianName === varian)?.varianPrice;
-            const basePrice = itemInfo?.price || 0;
-            const finalPrice = varianPrice || basePrice;
-
-            totalAmount += finalPrice * cartItems[itemKey];
+          // jumlah harga item yang dipilih user
+          let sumItems = 0;
+          for (const sel of (bundle.selections || [])) {
+            const prod = (food_list || []).find(p => String(p._id) === String(sel.foodId));
+            if (!prod) continue;
+            let price = Number(prod.price || 0);
+            if (sel.varianIndex != null && prod.varians?.[sel.varianIndex]) {
+              const v = prod.varians[sel.varianIndex];
+              price = Number(v.varianPrice ?? price);
             }
-        }
-        return totalAmount;
+            const pickQty = Number(sel.quantity || 1);
+            sumItems += price * pickQty;
+          }
+
+          const q = Number(bundle.quantity || 1);
+          const base = Number(h.basePrice || 0);
+          const disc = Number(h.discountAmount || 0);
+
+          let amount = 0;
+          switch (h.pricingMode) {
+            case "FIXED":
+              amount = base * q;
+              break;
+            case "SUM_MINUS_DISCOUNT":
+              amount = Math.max(0, (sumItems * q) - disc);
+              break;
+            case "BASE_PLUS_ITEMS":
+              amount = Math.max(0, ((base + sumItems) * q) - disc);
+              break;
+            default:
+              amount = base * q; // fallback
+          }
+          return amount;
+        };
+
+
+        const getTotalCartAmount = () => {
+          let totalAmount = 0;
+
+          // 1) Produk biasa
+          for (const itemKey in cartItems) {
+            const qty = cartItems[itemKey];
+            if (qty > 0) {
+              const [id, varian] = itemKey.split("_");
+              const itemInfo = food_list.find((p) => p._id === id);
+              const varianPrice = itemInfo?.varians?.find(v => v.varianName === varian)?.varianPrice;
+              const basePrice = itemInfo?.price || 0;
+              const finalPrice = (varianPrice != null ? varianPrice : basePrice);
+              totalAmount += finalPrice * qty;
+            }
+          }
+
+          // 2) Bundles / Hampers
+          for (const b of (cartBundles || [])) {
+            totalAmount += getBundleSubtotal(b, hampers, food_list);
+          }
+
+          return totalAmount;
         };
 
         const [options, setOptions] = useState({
@@ -145,7 +195,28 @@ const StoreContextProvider = (props) => {
             }
           };
 
-    
+     
+          const fetchHampers = async (page, limit) => {
+            try {
+              const usePaging =
+                page != null &&
+                limit != null &&
+                String(page).trim() !== "" &&
+                String(limit).trim() !== "";
+
+              const params = usePaging ? { page, limit } : {};
+
+              const res = await axios.get(`${url}/api/hamper/list`, { params });
+              if (res.data?.success) {
+                setHampers(res.data.data || []);
+                setHampersPagination(res.data.pagination || null);
+              }
+            } catch (e) {
+              console.error("Gagal fetch hampers:", e);
+            }
+          };
+
+
     const fetchFoodList = async () => {
         const response = await axios.get(url+"/api/food/list");
         
@@ -159,41 +230,105 @@ const StoreContextProvider = (props) => {
       }
 
       const loadCartData = async (token) => {
-        const response = await axios.post(url+"/api/cart/get", {}, {headers:{token}})
-        setCartItems(response.data.cartData);
-      }
+        const response = await axios.post(`${url}/api/cart/get`, {}, { headers: { token } })
+        setCartItems(response.data.cartData || {});
+        setCartBundles(response.data.cartBundles || []);
+      };
 
-    useEffect(()=>{
-
+      useEffect(() => {
         async function loadData(){
-            await fetchFoodList();
-            if (localStorage.getItem("token")) {
-                setToken(localStorage.getItem("token"));
-                await loadCartData(localStorage.getItem("token"));
-            }
+          await fetchFoodList();
+          await fetchHampers(); 
 
+          // if (localStorage.getItem("token")) {
+          //   setToken(localStorage.getItem("token"));
+          //   await loadCartData(localStorage.getItem("token"));
+          // }
         }
-
         loadData();
-    },[])
+      }, []);
 
-    useEffect(() => {
-        localStorage.setItem("cartBundles", JSON.stringify(cartBundles));
-      }, [cartBundles]);
+      useEffect(() => {
+        (async () => {
+          if (token) {
+            // pindahkan bundling dari localStorage -> server
+            await syncLocalBundlesToServer();
+            // setelah sync, refresh cart (produk + bundles) dari server
+            await loadCartData(token);
+          }
+        })();
+      }, [token]);
 
-    const quantityItem = () => {
-        let quantity = 0;
-        for (const item in cartItems){
-            if (cartItems[item] > 0) {
-                let itemInfo = food_list.find((product) => product._id === item);
-                quantity += cartItems[item];
-            }
-
+      useEffect(() => {
+        if (!token) {
+          localStorage.setItem("cartBundles", JSON.stringify(cartBundles));
         }
-        return quantity;
-    }
+      }, [cartBundles, token]);
 
-    const addBundleToCart = (bundlePayload) => {
+
+
+      const quantityItem = () => {
+        // jumlah item produk biasa (cartItems)
+        const productQty = Object.values(cartItems).reduce((sum, q) => sum + (q || 0), 0);
+      
+        // jumlah paket hampers (cartBundles) — gunakan quantity per bundle
+        const bundleQty = (cartBundles || []).reduce((sum, b) => {
+          const q = Number(b?.quantity) || 1; // default 1 kalau belum ada
+          return sum + q;
+        }, 0);
+      
+        return productQty + bundleQty;
+      };
+
+      // ===== Bundle helpers ke server =====
+      const addBundleToCartServer = async (payload) => {
+        // payload: { bundleId, name, quantity, selections }
+        await axios.post(`${url}/api/cart/bundle/add`, payload, { headers: { token } });
+      };
+
+      const updateBundleQtyServer = async (id, body) => {
+        // body bisa { delta: 1 } / { delta: -1 } / { quantity: N }
+        const res = await axios.post(`${url}/api/cart/bundle/qty`, { id, ...body }, { headers: { token } });
+        return res.data?.cartBundles || [];
+      };
+
+      const removeBundleFromCartServer = async (id) => {
+        const res = await axios.post(`${url}/api/cart/bundle/remove`, { id }, { headers: { token } });
+        return res.data?.cartBundles || [];
+      };
+
+      const syncLocalBundlesToServer = async () => {
+        try {
+          // ambil localStorage hanya sekali saat user BARU login
+          const raw = localStorage.getItem("cartBundles");
+          const localBundles = raw ? JSON.parse(raw) : [];
+          if (!localBundles.length) return;
+          await axios.post(`${url}/api/cart/bundle/sync`, { bundles: localBundles }, { headers: { token } });
+          localStorage.removeItem("cartBundles"); // selesai dipindah ke server
+        } catch (e) {
+          console.warn("Sync bundles gagal:", e?.message);
+        }
+      };
+
+      const addBundleToCart = async (bundlePayload) => {
+        // bundlePayload: { bundleId, name, quantity, selections }
+        if (token) {
+          // simpan di server
+          await addBundleToCartServer({
+            bundleId: bundlePayload.bundleId,
+            name: bundlePayload.name,
+            quantity: bundlePayload.quantity || 1,
+            selections: bundlePayload.selections,
+            image:bundlePayload.image,
+          });
+          // ambil ulang dari server
+          const res = await axios.post(`${url}/api/cart/get`, {}, { headers: { token } });
+          setCartBundles(res.data?.cartBundles || []);
+          toast.success("Hampers ditambahkan ke keranjang");
+          return;
+        }
+      
+        // fallback: localStorage (guest)
         const key = JSON.stringify({ bundleId: bundlePayload.bundleId, selections: bundlePayload.selections });
         setCartBundles((prev) => {
           const idx = prev.findIndex((b) => b._key === key);
@@ -206,21 +341,38 @@ const StoreContextProvider = (props) => {
         });
       };
     
-      const removeBundleFromCart = (id) => {
-        setCartBundles((prev) => prev.filter((b) => b.id !== id));
-      };
-
-      const incBundleQty = (id) => {
+      const incBundleQty = async (id) => {
+        if (token) {
+          const bundles = await updateBundleQtyServer(id, { delta: 1 });
+          setCartBundles(bundles);
+          return;
+        }
         setCartBundles(prev => prev.map(b => b.id === id ? { ...b, quantity: (b.quantity || 1) + 1 } : b));
       };
       
-      const decBundleQty = (id) => {
+      const decBundleQty = async (id) => {
+        if (token) {
+          const bundles = await updateBundleQtyServer(id, { delta: -1 });
+          setCartBundles(bundles);
+          return;
+        }
         setCartBundles(prev => prev.flatMap(b => {
           if (b.id !== id) return [b];
           const q = (b.quantity || 1) - 1;
-          return q > 0 ? [{ ...b, quantity: q }] : []; // kalau 0, hapus
+          return q > 0 ? [{ ...b, quantity: q }] : [];
         }));
       };
+      
+      const removeBundleFromCart = async (id) => {
+        if (token) {
+          const bundles = await removeBundleFromCartServer(id);
+          setCartBundles(bundles);
+          return;
+        }
+        setCartBundles((prev) => prev.filter((b) => b.id !== id));
+      };
+
+
     const contextValue = {
         food_list,
         cartItems,
@@ -238,7 +390,11 @@ const StoreContextProvider = (props) => {
         addBundleToCart,
         removeBundleFromCart,
         incBundleQty,        
-        decBundleQty,        
+        decBundleQty,
+        hampers,
+        hampersPagination,
+        fetchHampers,
+        getBundleSubtotal,        
     }
 
 

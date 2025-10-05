@@ -31,6 +31,16 @@
 
 }
 
+.lebaran-menu-list{
+    display: flex;
+    gap:40px;
+    justify-content: center;
+    text-align: center;
+    margin: 20px 0px;
+    
+
+}
+
 .explore-menu-list::-webkit-scrollbar{
     display: none;
 }
@@ -69,6 +79,20 @@
 
 }
 
+.menu-chip{
+    padding: 10px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 9999px;
+    font-weight: 600;
+    background: #fff;
+    cursor: pointer;
+  }
+  .menu-chip.active{
+    background: #111827;
+    color:#fff;
+    border-color:#111827;
+  }
+
 @media(max-width: 750px){
     .explore-menu h1{
         font-size: 4vh;
@@ -86,6 +110,10 @@
     
     }
 
+    .lebaran-menu-list{
+        margin: 0px 0px;
+        gap: 10px;
+    }
     .explore-menu-text{
         font-size: 14px;
     }
@@ -111,3 +139,4 @@
     }
 
 }
+

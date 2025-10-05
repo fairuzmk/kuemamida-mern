@@ -90,6 +90,17 @@
     border-radius: 15px 15px 0px 0px;
   }
 
+  .food-item-cta{
+    margin-top:8px;
+    padding:8px 12px;
+    border:1px solid #111827;
+    background:#111827;
+    color:#fff;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  .food-item-cta:hover{ opacity:.9; }
+  
   @media (max-width: 600px) {
     .food-item {
       height: 275px;
