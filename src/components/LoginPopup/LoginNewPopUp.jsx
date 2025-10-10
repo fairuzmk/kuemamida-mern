@@ -238,7 +238,7 @@ const handlePhoneChange = (e) => {
                     <input
                       key={index}
                       id={`otp-${index}`}
-                      type="text"
+                      type="number"
                       maxLength="1"
                       value={digit}
                       onChange={(e) => handleOtpChange(e.target.value, index)}
