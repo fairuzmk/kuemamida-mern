@@ -13,12 +13,12 @@ import { FaMoneyBill, FaMoneyCheck, FaTruck } from 'react-icons/fa';
 
 
 
-
 const PlaceOrder = () => {
   const navigate = useNavigate();
 
-  const {getTotalCartAmount, quantityItem, cartItems, food_list, url, options, fetchOptions, setCartItems, token, cartBundles} = useContext(StoreContext);
+  const {getTotalCartAmount, quantityItem, cartItems, food_list, url, options, fetchOptions, setCartItems, token, cartBundles, setCartBundles, loadCartData} = useContext(StoreContext);
 
+  
    const [user, setUser] = useState({ name: "", address: "", phone:"" });
 
   useEffect(() => {
@@ -45,11 +45,13 @@ const PlaceOrder = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [selectedShipping, setSelectedShipping] = useState( {value: "", label: "", price: 0});
-  const [payment_method, setPaymentMethod] = useState({ value: "" });
+
+  const [payment_method, setPaymentMethod] = useState({ value: "Transfer" });
 
 
   const [phone, setPhone] = useState('');
 
+  
 
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
@@ -121,9 +123,11 @@ const PlaceOrder = () => {
     try {
       const res = await axios.post(`${url}/api/order/place`, payload, {
         headers: { token }
+        
       });
   
       if (res.data.success) {
+               
         navigate(`/verify?success=true&orderId=${res.data.orderId}`);
       } else {
         alert("Gagal membuat order");
@@ -136,6 +140,8 @@ const PlaceOrder = () => {
       setIsLoading(false); // selesai loading
     }
   };
+
+
 
   const paymentMethod = [
     { value: "Transfer", label: "Transfer Bank", icon: <FaMoneyCheck /> },
@@ -155,7 +161,7 @@ const PlaceOrder = () => {
             required
             type="text"
             placeholder='Nama Penerima'
-            value={user.name}
+            value={user.name??""}
             onChange={(e) => setUser(prev => ({ ...prev, name: e.target.value }))}
           />
         </div>
@@ -163,7 +169,7 @@ const PlaceOrder = () => {
         <input
             type="text"
             placeholder='Nomor HP (Whatsapp)'
-            value={user.phone}
+            value={user.phone??""}
             onChange={(e) => setUser(prev => ({ ...prev, phone: e.target.value }))}
           />
 
@@ -199,7 +205,7 @@ const PlaceOrder = () => {
           <h4 className="label">Alamat Lengkap</h4>
         <textarea
           placeholder='Alamat Lengkap'
-          value={user.address}
+          value={user.address??""}
           onChange={(e) => setUser({ ...user, address: e.target.value })}
         />
       </div>

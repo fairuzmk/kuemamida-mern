@@ -8,15 +8,18 @@ export const StoreContext = createContext(null)
 
 const StoreContextProvider = (props) => {
 
-    const [cartItems, setCartItems] = useState({});
+    const [cartItems, setCartItems] = useState(() => {
+       try { return JSON.parse(localStorage.getItem("cartItems")) || {}; } catch { return {}; }
+     });
     const [cartBundles, setCartBundles] = useState(() => {
         try { return JSON.parse(localStorage.getItem("cartBundles")) || []; } catch { return []; }
       });
 
     // const url = "https://kuemamida-backend.onrender.com";
     
-    const url = "https://kuemamida.milkioserver.my.id";
-    // const url = "http://localhost:4000";
+    // const url = "https://kuemamida.milkioserver.my.id";
+
+    const url = "http://localhost:4000";
     const [token, setToken] = useState(() => {
         return localStorage.getItem("token") || "";
     });
@@ -251,13 +254,21 @@ const StoreContextProvider = (props) => {
       useEffect(() => {
         (async () => {
           if (token) {
-            // pindahkan bundling dari localStorage -> server
-            await syncLocalBundlesToServer();
+            await Promise.all([
+                syncLocalItemsToServer(),   
+                syncLocalBundlesToServer(),   
+              ]);
             // setelah sync, refresh cart (produk + bundles) dari server
             await loadCartData(token);
           }
         })();
       }, [token]);
+
+       useEffect(() => {
+           if (!token) {
+             localStorage.setItem("cartItems", JSON.stringify(cartItems));
+           }
+         }, [cartItems, token]);
 
       useEffect(() => {
         if (!token) {
@@ -295,6 +306,15 @@ const StoreContextProvider = (props) => {
       const removeBundleFromCartServer = async (id) => {
         const res = await axios.post(`${url}/api/cart/bundle/remove`, { id }, { headers: { token } });
         return res.data?.cartBundles || [];
+      };
+
+
+      const syncLocalItemsToServer = async () => {
+        const raw = localStorage.getItem("cartItems");
+        const local = raw ? JSON.parse(raw) : {};
+        if (!Object.keys(local).length) return;
+        await axios.post(`${url}/api/cart/items/sync`, { items: local }, { headers: { token } });
+        localStorage.removeItem("cartItems");
       };
 
       const syncLocalBundlesToServer = async () => {
@@ -394,7 +414,9 @@ const StoreContextProvider = (props) => {
         hampers,
         hampersPagination,
         fetchHampers,
-        getBundleSubtotal,        
+        getBundleSubtotal,       
+        setCartBundles,
+        loadCartData 
     }
 
 

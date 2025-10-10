@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import './Navbar.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartShopping, } from '@fortawesome/free-solid-svg-icons';
@@ -22,18 +22,36 @@ const Navbar = ({setShowLogin}) => {
 
     const [showSidebar, setShowSidebar] = useState(false);
 
-    const {getTotalCartAmount, token, setToken, url} = useContext(StoreContext);
+    const {getTotalCartAmount, token, setToken, url, setCartItems, setCartBundles} = useContext(StoreContext);
 
     const [user, setUser] = useState({ name: "", address: "" });
 
     const navigate = useNavigate();
 
-    const logout = () => {
-       localStorage.removeItem('token')
-       setToken("");
-       navigate("/")
+    const suppressLocalPersist = useRef(false);
 
-    }
+    const logout = () => {
+      // hentikan persist cart lokal
+      // (ref ini di Navbar tidak berefek ke StoreContext; aman dihapus kalau mau)
+      // suppressLocalPersist.current = true;
+    
+      // bersihkan cart state & storage
+      setCartItems && setCartItems({});
+      setCartBundles && setCartBundles([]);
+      localStorage.removeItem("cartItems");
+      localStorage.removeItem("cartBundles");
+    
+     // HAPUS TOKEN PERSISTEN
+     localStorage.removeItem("token");   // <<< PENTING
+     // kalau kamu simpan di cookie juga, hapus cookie-nya:
+     document.cookie = "token=; Max-Age=0; path=/";
+    
+      // reset token state
+      setToken("");
+    
+     // (opsional) bersihkan default header axios kalau pernah diset global
+     delete axios.defaults.headers.common["token"];
+    };
 
     useEffect(() => {
       const fetchUser = async () => {
@@ -104,7 +122,7 @@ const Navbar = ({setShowLogin}) => {
             <>
             <li onClick={() => { setShowSidebar(false); }}>
             <FontAwesomeIcon icon={faUser} className="svg-sidebar-icon" />Hai, {user.name}</li>
-            <li onClick={() => { setShowLogin(false); setShowSidebar(false); }}>
+            <li onClick={() => { logout(); setShowLogin(false); setShowSidebar(false); }}>
             <FontAwesomeIcon icon={faRightFromBracket} className="svg-sidebar-icon" />Sign Out</li>
             </>
             }

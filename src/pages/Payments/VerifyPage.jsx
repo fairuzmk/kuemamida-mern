@@ -22,8 +22,17 @@ const VerifyPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-   const {url} = useContext(StoreContext);
+   const {url, setCartItems, setCartBundles, loadCartData, token} = useContext(StoreContext);
 
+   useEffect(() => {
+    // bersihkan cart lokal setelah mendarat di halaman ini
+    setCartItems({});
+    setCartBundles([]);
+    localStorage.removeItem('cartItems');
+    localStorage.removeItem('cartBundles');
+    // refresh cart server supaya state sinkron
+    loadCartData?.(token);
+  }, []);
 
   useEffect(() => {
     const fetchOrder = async () => {

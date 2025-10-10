@@ -18,24 +18,29 @@ const Cart = () => {
   const navigate = useNavigate();
 
 
-   const [bundleAmounts, setBundleAmounts] = React.useState(0);
+  const [bundleAmounts, setBundleAmounts] = React.useState({});
+
   useEffect(() => {
      let cancelled = false;
      (async () => {
        if (!cartBundles?.length) { if (!cancelled) setBundleAmounts({}); return; }
        try {
          const results = await Promise.all(
-           cartBundles.map(b =>
+           cartBundles.map(b => {
+            const key = stableBundleKey(b);
              axios.post(`${url}/api/hamper/preview`, {
                bundleId: b.bundleId,
                quantity: b.quantity,
                selections: b.selections,
-             }).then(r => ({ id: b.id, amount: r.data?.success && r.data?.valid ? Number(r.data.amount || 0) : 0 }))
-           )
+             }).then(r => ({
+                key,
+                amount: r.data?.success && r.data?.valid ? Number(r.data.amount || 0) : 0
+              }))
+          })
          );
          if (!cancelled) {
            const map = {};
-           results.forEach(r => { map[r.id] = r.amount; });
+           results.forEach(r => { map[r.key] = r.amount; });
            setBundleAmounts(map);
          }
        } catch {
@@ -46,6 +51,18 @@ const Cart = () => {
    }, [cartBundles, url]);
 
   const isCartEmpty = Object.values(cartItems).every(qty => qty === 0) && (!cartBundles || cartBundles.length === 0);
+
+
+// ==== KEY HELPERS (letakkan di atas function Cart) ====
+const stableBundleKey = (b) => {
+  const id = b?.bundleId || b?._id || "";
+  const sig = (b?.selections || [])
+    .map(sel => `${sel.foodId || sel.id}_${sel.varianIndex ?? ""}_${sel.slotIndex ?? ""}`)
+    .sort()
+    .join("|");
+  // tidak memasukkan quantity agar key tidak berubah saat qty berubah
+  return `bundle:${id}:${sig}`;
+};
 
   
 
@@ -67,14 +84,14 @@ const Cart = () => {
               const price = variant?.varianPrice || product.price;
 
               return (
-                <div key={itemKey}>
+                <div key={`item:${itemKey}`}>
                   <div className="cart-items-title cart-items-item">
                     <img src={product.image} alt="" />
                     <div className='cart-items-item-description'>
                     <h3>{product.name} </h3>
                     <p>{variant ? `Varian: ${variant.varianName}` : ''}</p>
                     <p>{qty} x {price.toLocaleString("id-ID")}</p>
-                    <p>Stock: {variant.varianStock}</p>
+                    <p>Stock: {variant ? variant.varianStock : product.stock}</p>
                     <div className='item-counter-cart-wrapper'>
                       <div className="item-counter-cart">
                         <FontAwesomeIcon icon={faMinus} onClick={() => removeFromCart(itemKey)} />
@@ -112,15 +129,15 @@ const Cart = () => {
                   // counter per bundleId
                   const numbering = new Map();
                   return cartBundles.map((b) => {
-                    const perBundleAmount = bundleAmounts[b.id] ?? null;
-
+                    const k = stableBundleKey(b);
+                    const perBundleAmount = bundleAmounts[k] ?? null;
                     const current = (numbering.get(b.bundleId) || 0) + 1;
                     numbering.set(b.bundleId, current);
 
                     const displayName = `${b.name || "Hampers"} #${current}`;
 
                     return (
-                      <div key={b.id}>
+                      <div key={k}>
                         <div className="cart-items-title cart-items-item">
                           <div className='hamper-image-box'>
                             <img src={b.image} alt="" />
