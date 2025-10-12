@@ -17,6 +17,11 @@ export default function HamperDetailPage() {
   const [loading, setLoading] = useState(false);
   const [adding, setAdding] = useState(false); // loading untuk tombol tambah ke keranjang
 
+  // --- helper: bikin Set varian allowed (lowercase) ---
+  const getAllowedVariantSet = (slot) => {
+    const arr = slot?.allowedVariants || [];
+    return new Set(arr.map((x) => String(x).trim().toLowerCase()));
+  };
 
   // ambil detail hampers
   useEffect(() => {
@@ -64,14 +69,34 @@ export default function HamperDetailPage() {
     });
   }, [hamper, food_list]);
 
-  // ubah pilihan user
+  // ubah pilihan user (dengan auto-select 1 varian jika hanya satu yang valid)
   const setPick = (slotIdx, pickIdx, field, value) => {
     setSelections((prev) => {
       const next = prev.map((s) => ({ ...s, picks: s.picks.map((p) => ({ ...p })) }));
       next[slotIdx].picks[pickIdx][field] = value;
+
       if (field === "foodId") {
-        next[slotIdx].picks[pickIdx].varianIndex = undefined; // reset varian saat ganti produk
+        // reset varian jika ganti produk
+        next[slotIdx].picks[pickIdx].varianIndex = undefined;
+
+        // auto-select bila hanya ada 1 varian yang valid
+        const slotRule = hamper?.slots?.[slotIdx];
+        const food = (food_list || []).find((f) => f._id === value);
+        if (slotRule?.allowVariants && food?.varians?.length) {
+          const allowedSet = getAllowedVariantSet(slotRule);
+          if (allowedSet.size > 0) {
+            const candidates = food.varians
+              .map((v, i) => ({ v, i }))
+              .filter(({ v }) =>
+                allowedSet.has(String(v.varianName || "").trim().toLowerCase())
+              );
+            if (candidates.length === 1) {
+              next[slotIdx].picks[pickIdx].varianIndex = candidates[0].i;
+            }
+          }
+        }
       }
+
       return next;
     });
   };
@@ -86,9 +111,8 @@ export default function HamperDetailPage() {
       image: hamper.image,
       quantity: Number(quantity) || 1,
       selections: [],
-
     };
-    
+
     for (const s of selections) {
       for (const p of s.picks) {
         if (!p.foodId) {
@@ -108,10 +132,10 @@ export default function HamperDetailPage() {
 
   // preview harga via backend
   const handlePreview = async () => {
-     if (!isComplete()) {
-         toast.warn("Harap isi paket terlebih dahulu");
-         return { ok: false };
-       }
+    if (!isComplete()) {
+      toast.warn("Harap isi paket terlebih dahulu");
+      return { ok: false };
+    }
     const bp = buildBundlePayload();
     if (!bp) return { ok: false };
     setLoading(true);
@@ -138,24 +162,25 @@ export default function HamperDetailPage() {
     }
   };
 
-   const addToCartBundle = typeof addBundleToCart === "function"
-   ? addBundleToCart
-   : (bp) => {
-       const raw = localStorage.getItem("cartBundles");
-       const cur = raw ? JSON.parse(raw) : [];
-       const key = JSON.stringify({ bundleId: bp.bundleId, selections: bp.selections });
-       const idx = cur.findIndex((x) => x._key === key);
-       if (idx >= 0) cur[idx].quantity = (cur[idx].quantity || 1) + (bp.quantity || 1);
-       else cur.push({ ...bp, _key: key, id: String(Date.now()) });
-       localStorage.setItem("cartBundles", JSON.stringify(cur));
-     };
+  const addToCartBundle =
+    typeof addBundleToCart === "function"
+      ? addBundleToCart
+      : (bp) => {
+          const raw = localStorage.getItem("cartBundles");
+          const cur = raw ? JSON.parse(raw) : [];
+          const key = JSON.stringify({ bundleId: bp.bundleId, selections: bp.selections });
+          const idx = cur.findIndex((x) => x._key === key);
+          if (idx >= 0) cur[idx].quantity = (cur[idx].quantity || 1) + (bp.quantity || 1);
+          else cur.push({ ...bp, _key: key, id: String(Date.now()) });
+          localStorage.setItem("cartBundles", JSON.stringify(cur));
+        };
 
   // tambah ke keranjang
   const handleAddToCart = async () => {
-     if (!isComplete()) {
-         toast.warn("Harap isi paket terlebih dahulu");
-         return;
-       }
+    if (!isComplete()) {
+      toast.warn("Harap isi paket terlebih dahulu");
+      return;
+    }
     const bp = buildBundlePayload();
     if (!bp) return;
 
@@ -164,26 +189,38 @@ export default function HamperDetailPage() {
       const r = await handlePreview();
       if (!r?.ok) return;
     }
-       try {
-           setAdding(true);
-           await Promise.resolve(addToCartBundle(bp)); // jaga-jaga kalau nanti async
-           toast.success("Hampers ditambahkan ke keranjang");
-         } catch (e) {
-           toast.error("Gagal menambahkan ke keranjang");
-         } finally {
-           setAdding(false);
-         }
+    try {
+      setAdding(true);
+      await Promise.resolve(addToCartBundle(bp)); // jaga-jaga kalau nanti async
+      toast.success("Hampers ditambahkan ke keranjang");
+    } catch (e) {
+      toast.error("Gagal menambahkan ke keranjang");
+    } finally {
+      setAdding(false);
+    }
   };
 
-   const isComplete = () => {
-       if (!hamper) return false;
-       for (const s of selections) {
-         for (const p of s.picks) {
-           if (!p.foodId) return false;
-         }
-       }
-       return true;
-     };
+  // validasi lengkap: jika slot membatasi varian, varian wajib dipilih dan harus termasuk allowed
+  const isComplete = () => {
+    if (!hamper) return false;
+    for (const s of selections) {
+      const slotRule = hamper.slots?.[s.slotIndex];
+      const allowedSet = getAllowedVariantSet(slotRule);
+
+      for (const p of s.picks) {
+        if (!p.foodId) return false;
+
+        if (slotRule?.allowVariants && allowedSet.size > 0) {
+          const food = (food_list || []).find((f) => f._id === p.foodId);
+          const v = p.varianIndex != null ? food?.varians?.[p.varianIndex] : null;
+          if (!v) return false;
+          const nameOk = allowedSet.has(String(v.varianName || "").trim().toLowerCase());
+          if (!nameOk) return false;
+        }
+      }
+    }
+    return true;
+    };
 
   if (!hamper) return <div className="hamper-loading">Memuat hampers…</div>;
 
@@ -202,23 +239,22 @@ export default function HamperDetailPage() {
         <h1 className="hamper-title">{hamper.name}</h1>
 
         <p className="hamper-price">
-          { hamper.pricingMode === "FIXED" ? 
-          (
+          {hamper.pricingMode === "FIXED" ? (
             <>Rp {Number(hamper.basePrice || 0).toLocaleString()} / paket</>
-          ) : hamper.pricingMode === "SUM_MINUS_DISCOUNT" ?  (
+          ) : hamper.pricingMode === "SUM_MINUS_DISCOUNT" ? (
             <>
               Harga dinamis: (jumlah harga item − diskon Rp{" "}
               {Number(hamper.discountAmount || 0).toLocaleString()})
             </>
-            )
-           : hamper.pricingMode === "BASE_PLUS_ITEMS" ? (
-               <>
-                 (Harga item + Packaging Rp {Number(hamper.basePrice || 0).toLocaleString()} 
-                  {Number(hamper.discountAmount || 0) > 0 ? <> − diskon Rp {Number(hamper.discountAmount || 0).toLocaleString()}</> : null})
-               </>
-            )
-            : null
-            }
+          ) : hamper.pricingMode === "BASE_PLUS_ITEMS" ? (
+            <>
+              (Harga item + Packaging Rp {Number(hamper.basePrice || 0).toLocaleString()}
+              {Number(hamper.discountAmount || 0) > 0 ? (
+                <> − diskon Rp {Number(hamper.discountAmount || 0).toLocaleString()}</>
+              ) : null}
+              )
+            </>
+          ) : null}
         </p>
 
         <div className="hamper-desc">
@@ -227,13 +263,10 @@ export default function HamperDetailPage() {
 
         <div className="hamper-slots">
           <h3>Pilih Isi Paket</h3>
-          {!isComplete() && (
-            <div className="slot-warning">
-              Harap isi semua slot paket terlebih dahulu.
-            </div>
-          )}
+          {!isComplete() && <div className="slot-warning">Harap isi semua slot paket terlebih dahulu.</div>}
           {(hamper.slots || []).map((slot, sIdx) => {
             const candidates = candidatesBySlot[sIdx] || [];
+            const allowedSet = getAllowedVariantSet(slot);
             return (
               <div key={sIdx} className="slot-card">
                 <div className="slot-head">
@@ -243,6 +276,20 @@ export default function HamperDetailPage() {
 
                 {(selections[sIdx]?.picks || []).map((pick, pIdx) => {
                   const selectedFood = candidates.find((f) => f._id === pick.foodId);
+
+                  // siapkan daftar varian yang difilter (kalau ada aturan)
+                  let filteredVariants = [];
+                  if (slot.allowVariants && selectedFood?.varians?.length) {
+                    filteredVariants =
+                      allowedSet.size > 0
+                        ? selectedFood.varians
+                            .map((v, i) => ({ v, i }))
+                            .filter(({ v }) =>
+                              allowedSet.has(String(v.varianName || "").trim().toLowerCase())
+                            )
+                        : selectedFood.varians.map((v, i) => ({ v, i }));
+                  }
+
                   return (
                     <div key={pIdx} className="slot-row">
                       {/* pilih produk */}
@@ -273,15 +320,19 @@ export default function HamperDetailPage() {
                             )
                           }
                         >
-                          <option value="">(default)</option>
-                          {selectedFood.varians.map((v, i) => (
+                          
+                          {filteredVariants.map(({ v, i }) => (
                             <option key={`${selectedFood._id}_${i}`} value={i}>
-                              {v.varianName} — Rp {(v.varianPrice ?? selectedFood.price).toLocaleString()} — stok {v.varianStock}
+                              {v.varianName} — Rp{" "}
+                              {(v.varianPrice ?? selectedFood.price).toLocaleString()} — stok{" "}
+                              {v.varianStock}
                             </option>
                           ))}
                         </select>
                       ) : selectedFood ? (
-                        <span className="slot-price">Rp {Number(selectedFood.price || 0).toLocaleString()}</span>
+                        <span className="slot-price">
+                          Rp {Number(selectedFood.price || 0).toLocaleString()}
+                        </span>
                       ) : null}
                     </div>
                   );
@@ -296,7 +347,9 @@ export default function HamperDetailPage() {
             {loading ? "Memeriksa..." : "Preview Harga"}
           </button>
           {previewAmount != null && (
-            <div className="preview-amount">Perkiraan total paket: Rp {previewAmount.toLocaleString()}</div>
+            <div className="preview-amount">
+              Perkiraan total paket: Rp {previewAmount.toLocaleString()}
+            </div>
           )}
         </div>
 
@@ -310,16 +363,10 @@ export default function HamperDetailPage() {
         </div>
 
         <div className="hamper-actions">
-         <button
-            className="btn primary"
-            disabled={!isComplete() || adding}
-            onClick={handleAddToCart}
-          >
-          {adding ? "Menambahkan..." : "Tambah ke Keranjang"}
+          <button className="btn primary" disabled={!isComplete() || adding} onClick={handleAddToCart}>
+            {adding ? "Menambahkan..." : "Tambah ke Keranjang"}
           </button>
         </div>
-
-        
       </div>
     </div>
   );
