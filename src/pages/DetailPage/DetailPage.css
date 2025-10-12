@@ -89,6 +89,56 @@
   gap: 10px;
 }
 
+/* Baris aksi qty + tombol */
+.qty-actions {
+  display: flex;
+  align-items: center;     /* vertikal rata tengah */
+  gap: 12px;               /* jarak antar elemen */
+  flex-wrap: wrap;         /* biar rapi di layar kecil */
+}
+
+/* Counter styled seperti tombol, tingginya sama */
+.item-counter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 40px;            /* samakan dengan tombol */
+  padding: 0 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+/* Ikon +/- lebih clickable */
+.item-counter svg {
+  cursor: pointer;
+}
+
+/* Tombol “Masukkan Keranjang” */
+.btn.primary.add-to-cart {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;            /* samakan dengan counter */
+  padding: 0 14px;         /* vertikal 0 supaya pas 40px */
+  line-height: 40px;       /* optional: untuk teks pas tengah */
+}
+
+/* Hindari ada margin top bawaan yang bikin tidak sejajar */
+.btn.primary.add-to-cart, .item-counter {
+  margin-top: 0 !important;
+}
+/* Responsif: di mobile, tombol bisa melebar */
+@media (max-width: 520px) {
+  .qty-actions {
+    gap: 10px;
+  }
+  .add-to-cart-btn {
+    flex: 1;            /* tombol ikut melebar */
+  }
+}
+
+
 .quantity-selector button {
   width: 30px;
   height: 30px;

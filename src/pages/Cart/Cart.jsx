@@ -21,34 +21,50 @@ const Cart = () => {
   const [bundleAmounts, setBundleAmounts] = React.useState({});
 
   useEffect(() => {
-     let cancelled = false;
-     (async () => {
-       if (!cartBundles?.length) { if (!cancelled) setBundleAmounts({}); return; }
-       try {
-         const results = await Promise.all(
-           cartBundles.map(b => {
+    let cancelled = false;
+  
+    (async () => {
+      if (!cartBundles?.length) {
+        if (!cancelled) setBundleAmounts({});
+        return;
+      }
+  
+      try {
+        const results = await Promise.all(
+          cartBundles.map((b) => {
             const key = stableBundleKey(b);
-             axios.post(`${url}/api/hamper/preview`, {
-               bundleId: b.bundleId,
-               quantity: b.quantity,
-               selections: b.selections,
-             }).then(r => ({
+            // ⬇️ RETURN the promise
+            return axios
+              .post(`${url}/api/hamper/preview`, {
+                bundleId: b.bundleId,
+                quantity: b.quantity,
+                selections: b.selections,
+              })
+              .then((r) => ({
                 key,
-                amount: r.data?.success && r.data?.valid ? Number(r.data.amount || 0) : 0
+                amount:
+                  r.data?.success && r.data?.valid
+                    ? Number(r.data.amount || 0)
+                    : 0,
               }))
+              .catch(() => ({ key, amount: 0 })); // guard per request
           })
-         );
-         if (!cancelled) {
-           const map = {};
-           results.forEach(r => { map[r.key] = r.amount; });
-           setBundleAmounts(map);
-         }
-       } catch {
-         if (!cancelled) setBundleAmounts({});
-       }
-     })();
-     return () => { cancelled = true; };
-   }, [cartBundles, url]);
+        );
+  
+        if (!cancelled) {
+          const map = {};
+          for (const r of results) map[r.key] = r.amount;
+          setBundleAmounts(map);
+        }
+      } catch {
+        if (!cancelled) setBundleAmounts({});
+      }
+    })();
+  
+    return () => {
+      cancelled = true;
+    };
+  }, [cartBundles, url]);
 
   const isCartEmpty = Object.values(cartItems).every(qty => qty === 0) && (!cartBundles || cartBundles.length === 0);
 
@@ -123,7 +139,7 @@ const stableBundleKey = (b) => {
         {/* === Bundles / Hampers === */}
             {cartBundles && cartBundles.length > 0 && (
               <>
-                <h3 style={{ marginTop: 12 }}>Paket Hampers</h3>
+                <h3 style={{ marginTop: 12 }}>Paket Bundling</h3>
                 <hr />
                 {(() => {
                   // counter per bundleId

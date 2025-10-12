@@ -4,6 +4,14 @@ Bundle Component added
 Special Lebaran added
 Minor fixed (Metode Pembayaran default to transfer)
 
+
+
+
+V.2.2.0
++ Bundle dengan syarat varian dimodifikasi
++ Tombol add to cart untuk single product
+
+
 Next Feauture : 
 0. Menu Hampers Lebaran tambahkan syarat varian (dashboard)
     0.1 Varian dijadikan menu options?

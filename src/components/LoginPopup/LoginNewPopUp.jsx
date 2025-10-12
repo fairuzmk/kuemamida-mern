@@ -7,6 +7,7 @@ import { StoreContext } from '../../context/StoreContext';
 import axios from 'axios';
 import { Turnstile } from "@marsidev/react-turnstile";
 import { toast, ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 const LoginNewPopup = ({ setShowLogin }) => {
   const { url, setToken } = useContext(StoreContext);
@@ -292,7 +293,7 @@ const handlePhoneChange = (e) => {
             )}
           </div>
         </div>
-        <ToastContainer position="bottom-center" autoClose={2000} />
+        <ToastContainer position="top-center" autoClose={2000} />
       </form>
     </div>
   );

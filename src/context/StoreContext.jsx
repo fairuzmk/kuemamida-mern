@@ -29,50 +29,98 @@ const StoreContextProvider = (props) => {
     const [hampersPagination, setHampersPagination] = useState(null);
     
 
-    const addToCart = async (itemKey) => {
-      const [id, varianName] = itemKey.split("_");
+  //   const addToCart = async (itemKey) => {
+  //     const [id, varianName] = itemKey.split("_");
   
-      // Cari item berdasarkan ID dari food_list
-      const itemInfo = food_list.find((product) => product._id === id);
+  //     // Cari item berdasarkan ID dari food_list
+  //     const itemInfo = food_list.find((product) => product._id === id);
   
-      if (!itemInfo) {
-          toast.error("Produk tidak ditemukan");
-          return;
-      }
+  //     if (!itemInfo) {
+  //         toast.error("Produk tidak ditemukan");
+  //         return;
+  //     }
   
-      // Ambil stock berdasarkan varian (jika ada) atau stock utama
-      let availableStock = 0;
-      if (varianName) {
-          const varian = itemInfo.varians?.find(v => v.varianName === varianName);
-          if (!varian) {
-              toast.error("Varian tidak ditemukan");
-              return;
-          }
-          availableStock = varian.varianStock;
-      } else {
-          availableStock = itemInfo.stock;
-      }
+  //     // Ambil stock berdasarkan varian (jika ada) atau stock utama
+  //     let availableStock = 0;
+  //     if (varianName) {
+  //         const varian = itemInfo.varians?.find(v => v.varianName === varianName);
+  //         if (!varian) {
+  //             toast.error("Varian tidak ditemukan");
+  //             return;
+  //         }
+  //         availableStock = varian.varianStock;
+  //     } else {
+  //         availableStock = itemInfo.stock;
+  //     }
   
-      const currentQty = cartItems[itemKey] || 0;
+  //     const currentQty = cartItems[itemKey] || 0;
   
-      // Proteksi: tidak boleh melebihi stock
-      if (currentQty >= availableStock) {
-          toast.warn("Stok tidak mencukupi");
-          return;
-      }
+  //     // Proteksi: tidak boleh melebihi stock
+  //     if (currentQty >= availableStock) {
+  //         toast.warn("Stok tidak mencukupi");
+  //         return;
+  //     }
   
-      // Tambah ke cart
-      setCartItems((prev) => ({
-          ...prev,
-          [itemKey]: currentQty + 1,
-      }));
+  //     // Tambah ke cart
+  //     setCartItems((prev) => ({
+  //         ...prev,
+  //         [itemKey]: currentQty + 1,
+  //     }));
   
-      // Sync ke backend kalau ada token
-      if (token) {
-          await axios.post(url + "/api/cart/add", { itemKey }, { headers: { token } });
-      }
-  };
+  //     // Sync ke backend kalau ada token
+  //     if (token) {
+  //         await axios.post(url + "/api/cart/add", { itemKey }, { headers: { token } });
+  //     }
+  // };
 
+
+  // === Cart product (single) ===
+const addToCart = async (itemKey, qty = 1) => {
+  if (!itemKey) return;
+  const [id, varianName] = itemKey.split("_");
+  const itemInfo = food_list.find((p) => p._id === id);
+  if (!itemInfo) return toast.error("Produk tidak ditemukan");
+
+  // hitung stok varian / produk
+  let availableStock = 0;
+  if (varianName) {
+    const v = itemInfo.varians?.find((x) => x.varianName === varianName);
+    if (!v) return toast.error("Varian tidak ditemukan");
+    availableStock = Number(v.varianStock || 0);
+  } else {
+    availableStock = Number(itemInfo.stock || 0);
+  }
+
+  // pakai functional update agar tidak kena stale state saat tambah cepat/loop
+  // juga batasi penambahan terhadap sisa stok
+  let added = 0;
+  setCartItems((prev) => {
+    const cur = Number(prev[itemKey] || 0);
+    const remaining = Math.max(0, availableStock - cur);
+    const toAdd = Math.min(remaining, Math.max(1, Number(qty) || 1));
+    if (toAdd <= 0) {
+      toast.warn("Stok tidak mencukupi");
+      return prev;
+    }
+    added = toAdd; // simpan utk dipakai setelah setState
+    return { ...prev, [itemKey]: cur + toAdd };
+  });
+
+  // sinkron ke server (kalau login). Servermu sekarang endpoint-nya add per 1,
+  // jadi kirim berulang; kalau nanti ada endpoint batch, ganti jadi satu request.
+  if (token && added > 0) {
+    try {
+      for (let i = 0; i < added; i++) {
+        // penting: await supaya urut, hindari race di backend
+        // eslint-disable-next-line no-await-in-loop
+        await axios.post(url + "/api/cart/add", { itemKey }, { headers: { token } });
+      }
+    } catch (e) {
+      // optional: rollback ringan (tidak wajib)
+      console.warn("Sync addToCart gagal:", e?.message);
+    }
+  }
+};
         const removeFromCart = async (itemKey) => {
         setCartItems((prev) => {
             const updated = { ...prev };

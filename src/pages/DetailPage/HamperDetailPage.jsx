@@ -5,6 +5,7 @@ import "./HamperDetailPage.css";
 import { StoreContext } from "../../context/StoreContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FaCartPlus } from "react-icons/fa6";
 
 export default function HamperDetailPage() {
   const { id } = useParams();
@@ -363,8 +364,9 @@ export default function HamperDetailPage() {
         </div>
 
         <div className="hamper-actions">
-          <button className="btn primary" disabled={!isComplete() || adding} onClick={handleAddToCart}>
-            {adding ? "Menambahkan..." : "Tambah ke Keranjang"}
+          <button className="btn primary add-to-cart" disabled={!isComplete() || adding} onClick={handleAddToCart}>
+            <FaCartPlus className="icon" />
+            {adding ? "Menambahkan..." : "Masukkan Keranjang"}
           </button>
         </div>
       </div>
