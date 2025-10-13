@@ -1,0 +1,13 @@
+/* src/nprogress-theme.css */
+#nprogress .bar {
+  background: #a51717 !important; /* ganti warna di sini */
+  height: 3px;
+}
+#nprogress .peg {
+  box-shadow: 0 0 10px #a51717, 0 0 5px #a51717 !important;
+}
+/* kalau spinner diaktifkan */
+#nprogress .spinner-icon {
+  border-top-color: #a51717 !important;
+  border-left-color: #a51717 !important;
+}

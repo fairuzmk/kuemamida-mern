@@ -11,6 +11,9 @@ V.2.2.0
 + Bundle dengan syarat varian dimodifikasi
 + Tombol add to cart untuk single product
 
+V.2.2.1
++ Preloader Added
+
 
 Next Feauture : 
 0. Menu Hampers Lebaran tambahkan syarat varian (dashboard)

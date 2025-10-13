@@ -5,9 +5,160 @@
     <link rel="icon" type="image/svg+xml" href="/logomamida.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kue Mamida</title>
+
+    <!-- === First-load Overlay CSS (muncul sebelum React) === -->
+    <style>
+      :root{
+        --boot-bg: rgba(255,255,255,0.75);
+        --boot-backdrop: blur(6px);
+        --boot-card: #fff;
+        --boot-border: #e9ecef;
+        --boot-text: #111827;
+        --boot-muted: #6b7280;
+        --boot-accent: #111827; /* ganti sesuai brand */
+      }
+      html.no-scroll, body.no-scroll { overflow: hidden !important; }
+      #boot-overlay{
+        position: fixed; inset: 0; z-index: 99999;
+        display: grid; place-items: center;
+        background: var(--boot-bg);
+        -webkit-backdrop-filter: var(--boot-backdrop);
+        backdrop-filter: var(--boot-backdrop);
+        transition: opacity .35s ease;
+      }
+      #boot-overlay.done{ opacity: 0; pointer-events: none; }
+      .boot-box{
+        width: min(500px, 90vw);
+        background: var(--boot-card);
+        border: 1px solid var(--boot-border);
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.06);
+        padding: 18px 16px;
+      }
+      .boot-head{
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+        justify-content: center; color: var(--boot-accent);
+        margin-bottom: 10px;
+        font: 600 14px/1.2 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      }
+      .boot-bar{
+        position: relative; height: 10px; border-radius: 999px;
+        background: linear-gradient(180deg,#f4f6f8,#eaeef2);
+        border: 1px solid #e6ebf0; overflow: hidden;
+      }
+      .boot-fill{
+        height: 100%; transform-origin: left;
+        transform: scaleX(0);
+        background: linear-gradient(90deg,#111827,#a51717 60%,#a51717);
+        transition: transform .2s cubic-bezier(.22,.61,.36,1);
+      }
+      .boot-shine{
+        position: absolute; inset: 0; transform: translateX(-100%);
+        background: linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);
+        animation: boot-shine 1.4s infinite;
+      }
+      .boot-meta{
+        display:flex; align-items:center; justify-content:space-between;
+        margin-top: 10px;
+        font: 500 12px/1.2 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        color: var(--boot-muted);
+      }
+      .boot-percent{ color: var(--boot-text); font-weight: 600; letter-spacing: .2px; }
+      @keyframes boot-shine { to { transform: translateX(100%); } }
+      @media (prefers-reduced-motion: reduce){
+        .boot-shine{ animation: none; }
+        .boot-fill{ transition: none; }
+      }
+    </style>
   </head>
   <body>
+    <!-- === First-load Overlay HTML (DITEPATKAN DI ATAS #root) === -->
+    <div id="boot-overlay" role="status" aria-live="polite" aria-label="Loading">
+      <div class="boot-box">
+        <div class="boot-head">
+          <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 31.79 31.79"><path d="M23,.1H9.05a9,9,0,0,0-9,9V23a9,9,0,0,0,9,9H23a9,9,0,0,0,9-8.95V9.05A9,9,0,0,0,23,.1Zm3.36,25.24c-4.76,0-4.68-9.86-4.68-9.86s-2.9,9.21-4.1,9.21-4.17-.54-4.17-3.77,1.92-14.15.72-14.15c-2.1,0-3.66,13.28-4.82,17.52.25,1,.29,1.31-.62,1.31-5,0-4.28-10-4.28-13.82,0-.55-.44-.55-.44-1.09C3.92,9.6,9,10.22,9,12.32s-.4,4.57-.4,7.18c0,.55,0,1,0,1.42.76-4.54,3-16.11,6.13-16.11,6.24,0,2.94,14.66,3.37,14.66s2.87-8.86,4.72-8.86,4,.48,4,2.44c0,1.19-.47,3-.47,5.4C26.38,23.71,27.83,25.34,26.31,25.34Z" transform="translate(-0.1 -0.1)" fill="#8f1a1d"/></svg>
+          <div>Memuat situs…</div>
+        </div>
+        <div class="boot-bar">
+          <div class="boot-fill"></div>
+          <div class="boot-shine"></div>
+        </div>
+        <div class="boot-meta">
+          <span class="boot-percent">0%</span>
+          <span>Mohon tunggu</span>
+        </div>
+      </div>
+    </div>
+
     <div id="root"></div>
+
+    <!-- === First-load Overlay JS (jalan sebelum React) === -->
+    <script>
+      (function () {
+        try {
+          var key = "firstLoadDone";
+          if (sessionStorage.getItem(key) === "1") {
+            // Jangan tampil lagi di tab ini
+            var ov = document.getElementById("boot-overlay");
+            if (ov) ov.remove();
+            return;
+          }
+
+          document.documentElement.classList.add("no-scroll");
+          document.body.classList.add("no-scroll");
+
+          var overlay = document.getElementById("boot-overlay");
+          var bar = overlay.querySelector(".boot-fill");
+          var pct = overlay.querySelector(".boot-percent");
+
+          var p = 0;         // progress current
+          var target = 90;   // sebelum window 'load' tercapai
+
+          function render() {
+            bar.style.transform = "scaleX(" + (p / 100) + ")";
+            pct.textContent = Math.floor(p) + "%";
+          }
+          function tick() {
+            p += Math.max(0.5, (target - p) * 0.06);
+            if (p > target) p = target;
+            render();
+            if (p < target) requestAnimationFrame(tick);
+          }
+          tick();
+
+          window.addEventListener("load", function () {
+            target = 100;
+            var shownAt = performance.now();
+            (function waitToHide() {
+              if (p >= 99.5) {
+                var left = Math.max(0, 300 - (performance.now() - shownAt));
+                setTimeout(function () {
+                  overlay.classList.add("done");
+                  setTimeout(function () {
+                    overlay.remove();
+                    document.documentElement.classList.remove("no-scroll");
+                    document.body.classList.remove("no-scroll");
+                    sessionStorage.setItem(key, "1"); // tampil sekali saja per tab
+                  }, 360);
+                }, left);
+              } else {
+                requestAnimationFrame(waitToHide);
+              }
+            })();
+          });
+
+          // fallback jika 'load' tak terpanggil dalam 20s
+          setTimeout(function(){ if (target < 100) target = 100; }, 20000);
+        } catch (e) {
+          var ov = document.getElementById("boot-overlay");
+          if (ov) ov.remove();
+          document.documentElement.classList.remove("no-scroll");
+          document.body.classList.remove("no-scroll");
+        }
+      })();
+    </script>
+
+    <!-- Script React kamu (biarkan tetap terakhir) -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
