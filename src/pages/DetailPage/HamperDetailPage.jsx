@@ -9,7 +9,7 @@ import { FaCartPlus } from "react-icons/fa6";
 
 export default function HamperDetailPage() {
   const { id } = useParams();
-  const { url, food_list, addBundleToCart, cartItems, cartBundles } = useContext(StoreContext);
+  const { url, food_list, addBundleToCart, getRemainingQty } = useContext(StoreContext);
 
   const [hamper, setHamper] = useState(null);
   const [quantity, setQuantity] = useState(1); // jumlah paket dibeli
@@ -101,9 +101,12 @@ export default function HamperDetailPage() {
               .filter(({ v }) =>
                 allowedSet.has(String(v.varianName || "").trim().toLowerCase())
               );
-            if (candidates.length === 1) {
-              next[slotIdx].picks[pickIdx].varianIndex = candidates[0].i;
-            }
+               if (candidates.length === 1) {
+                  const only = candidates[0];
+                   if (getRemainingQty(food._id, only.i) > 0) {
+                     next[slotIdx].picks[pickIdx].varianIndex = only.i;
+                   }
+                 }
           }
         }
       }
@@ -221,35 +224,25 @@ export default function HamperDetailPage() {
 
       // pastikan stok cukup untuk bundle yang akan ditambahkan (hitung pick sejenis)
       const ensureBundleRoom = (bp) => {
-        // hitung pick per produk/varian dalam 1 paket
-        const addMap = new Map(); // key => jumlah pick per paket
+        const countPerKey = new Map(); // `${foodId}|${varIdx}` -> picks per paket
         for (const sel of bp.selections || []) {
-          const k = keyFor(sel.foodId, sel.varianIndex);
-          addMap.set(k, (addMap.get(k) || 0) + 1);
+          const key = `${sel.foodId}|${Number.isInteger(sel.varianIndex) ? sel.varianIndex : -1}`;
+          countPerKey.set(key, (countPerKey.get(key) || 0) + 1);
         }
-
-        for (const [k, perPkgCount] of addMap) {
-          const [foodId, idxStr] = k.split("|");
+        for (const [key, perPkg] of countPerKey) {
+          const [foodId, idxStr] = key.split("|");
           const varIdx = Number(idxStr);
           const varIdxVal = isNaN(varIdx) || varIdx < 0 ? undefined : varIdx;
-
-          const food = (food_list || []).find((f) => String(f._id) === String(foodId));
-          if (!food) return false;
-
-          const stock = getVariantStock(food, varIdxVal);
-          const reserved = getAlreadyReserved(foodId, varIdxVal);
-          const need = perPkgCount * Number(bp.quantity || 1);
-          const after = reserved + need;
-
-          if (after > stock) {
-            const vName = getVariantName(food, varIdxVal);
-            const sisa = Math.max(0, stock - reserved);
-            toast.warn(`Stok ${food.name}${vName ? ` (${vName})` : ""} tersisa ${sisa}`);
+          const remaining = getRemainingQty(foodId, varIdxVal);
+          const need = perPkg * Number(bp.quantity || 1);
+          if (need > remaining) {
+            toast.warn("Stok paket melebihi stok tersedia");
             return false;
           }
         }
         return true;
       };
+      
 
 
 
@@ -443,18 +436,23 @@ export default function HamperDetailPage() {
                           }
                         >
                           
-                          {filteredVariants.map(({ v, i }) => (
-                            <option key={`${selectedFood._id}_${i}`} value={i}>
-                              {v.varianName} — Rp{" "}
-                              {(v.varianPrice ?? selectedFood.price).toLocaleString()} — stok{" "}
-                              {v.varianStock}
-                            </option>
-                          ))}
+                          {filteredVariants.map(({ v, i }) => {
+                             const remaining = getRemainingQty(selectedFood._id, i);
+                             return (
+                               <option
+                                 key={`${selectedFood._id}_${i}`}
+                                 value={i}
+                                 disabled={remaining <= 0}
+                               >
+                                 {v.varianName} — Rp {(v.varianPrice ?? selectedFood.price).toLocaleString()} — sisa {remaining}
+                               </option>
+                             );
+                           })}
                         </select>
                       ) : selectedFood ? (
-                        <span className="slot-price">
-                          Rp {Number(selectedFood.price || 0).toLocaleString()}
-                        </span>
+                          <span className="slot-price">
+                            Rp {Number(selectedFood.price || 0).toLocaleString()} • sisa {getRemainingQty(selectedFood._id, undefined)}
+                          </span>
                       ) : null}
                     </div>
                   );

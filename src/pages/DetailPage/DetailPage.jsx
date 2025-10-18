@@ -11,13 +11,19 @@ import { FaCartPlus } from "react-icons/fa6";
 const DetailPage = () => {
   const { slugAndId } = useParams();
   const id = slugAndId.split("-").slice(-1)[0];
-  const { food_list, cartItems, addToCart } = useContext(StoreContext);
+  const { food_list, cartItems, addToCart, getRemainingQty } = useContext(StoreContext);
 
   const product = food_list.find((item) => item._id === id);
 
+  
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [qty, setQty] = useState(1); // counter lokal (tidak langsung ke cart)
 
+   // index varian yang sedang dipilih (untuk helper stok realtime)
+ const selectedVarIdx = useMemo(() => {
+   if (!product || !selectedVariant) return undefined;
+   return (product.varians || []).findIndex(v => v.varianName === selectedVariant.varianName);
+ }, [product, selectedVariant]);
   // itemKey untuk cart single product
   const itemKey = useMemo(() => {
     if (!product) return null;
@@ -33,10 +39,9 @@ const DetailPage = () => {
     }
   }, [product]);
 
-  // stok dan sisa stok dibanding cart sekarang
-  const availableStock = selectedVariant?.varianStock ?? 0;
-  const alreadyInCart = itemKey ? (cartItems[itemKey] || 0) : 0;
-  const remaining = Math.max(0, availableStock - alreadyInCart);
+  // stok & sisa stok realtime (dikurangi cart single + bundling)
+   const availableStock = selectedVariant?.varianStock ?? 0; // tampilkan stok varian mentah
+   const remaining = getRemainingQty(product?._id, selectedVarIdx);
 
   const handleVariantChange = (varianName) => {
     const variant = product.varians.find((v) => v.varianName === varianName);
@@ -51,7 +56,6 @@ const DetailPage = () => {
 
   const handleAddToCart = async () => {
     if (!itemKey) return;
-    const remaining = Math.max(0, (selectedVariant?.varianStock ?? 0) - (cartItems[itemKey] || 0));
     if (remaining <= 0) return toast.warn("Stok varian habis atau sudah maksimal di keranjang");
   
     const toAdd = Math.min(qty, remaining);
@@ -82,13 +86,9 @@ const DetailPage = () => {
         <p className="product-price">Rp{Number(displayPrice).toLocaleString("id-ID")}</p>
 
         <p>
-          Stok varian: {availableStock}{" "}
-          {alreadyInCart > 0 ? (
-            <small style={{ color: "#777" }}>
-              (di keranjang: {alreadyInCart}, sisa: {remaining})
-            </small>
-          ) : null}
-        </p>
+           Stok varian: {availableStock}{" "}
+           <small style={{ color: "#777" }}>(sisa: {remaining})</small>
+         </p>
 
         {/* Varian */}
         {!!product.varians?.length && (

@@ -29,7 +29,55 @@ const StoreContextProvider = (props) => {
     const [hampersPagination, setHampersPagination] = useState(null);
     
 
+     // ===== Realtime stock helpers (single  bundling) =====
+     const _variantStock = (food, varIdx) =>
+       Number.isInteger(varIdx) ? Number(food?.varians?.[varIdx]?.varianStock || 0)
+                                : Number(food?.stock || 0);
+     const _variantName = (food, varIdx) =>
+       Number.isInteger(varIdx) ? String(food?.varians?.[varIdx]?.varianName || "") : "";
+    
+     // total qty di cart untuk (foodId,varIdx) dari single  bundling (kalikan quantity bundle)
+     const getReservedQty = (foodId, varIdx) => {
+       let sum = 0;
+       const food = (food_list || []).find(f => String(f._id) === String(foodId));
+       // single product (key: `${foodId}_${varianName}`)
+       const vName = _variantName(food, varIdx);
+       if (vName) sum += Number((cartItems || {})[`${foodId}_${vName}`] || 0);
+       // bundling (kalikan qty bundle)
+       for (const b of (cartBundles || [])) {
+         const perPkg = (b?.selections || []).filter(
+           (sel) =>
+             String(sel.foodId) === String(foodId) &&
+             ((sel.varianIndex ?? -1) === (Number.isInteger(varIdx) ? varIdx : -1))
+         ).length;
+         sum += perPkg * Number(b?.quantity || 1);
+       }
+       return sum;
+     };
 
+    
+     // sisa stok realtime = stok varian − reserved (single  bundling)
+     const getRemainingQty = (foodId, varIdx) => {
+       const food = (food_list || []).find(f => String(f._id) === String(foodId));
+       if (!food) return 0;
+       const stock = _variantStock(food, varIdx);
+       const reserved = getReservedQty(foodId, varIdx);
+       return Math.max(0, stock - reserved);
+     };
+    
+// cari index varian berdasarkan nama (robust)
+const resolveVarIdx = (food, varianName) => {
+  if (!food || !varianName) return undefined;
+  // exact match dulu
+  let idx = (food.varians || []).findIndex(v => v?.varianName === varianName);
+  if (idx >= 0) return idx;
+  // fallback: case-insensitive + trim
+  const target = String(varianName).trim().toLowerCase();
+  idx = (food.varians || []).findIndex(
+    v => String(v?.varianName || "").trim().toLowerCase() === target
+  );
+  return idx >= 0 ? idx : -1;
+};
 
   // === Cart product (single) ===
 const addToCart = async (itemKey, qty = 1) => {
@@ -38,23 +86,24 @@ const addToCart = async (itemKey, qty = 1) => {
   const itemInfo = food_list.find((p) => p._id === id);
   if (!itemInfo) return toast.error("Produk tidak ditemukan");
 
-  // hitung stok varian / produk
-  let availableStock = 0;
-  if (varianName) {
-    const v = itemInfo.varians?.find((x) => x.varianName === varianName);
-    if (!v) return toast.error("Varian tidak ditemukan");
-    availableStock = Number(v.varianStock || 0);
-  } else {
-    availableStock = Number(itemInfo.stock || 0);
-  }
+    // index varian aktif
+     // index varian aktif (robust)
+     const varIdx = varianName ? resolveVarIdx(itemInfo, varianName) : undefined;
+     // kalau kunci menyertakan varian tapi tidak ketemu → batalkan
+     if (varianName && (varIdx === -1 || varIdx === undefined)) {
+       return toast.error("Varian tidak ditemukan");
+     }
+   // sisa stok realtime (sudah dikurangi single+bundling di cart)
+    const remainingOverall = getRemainingQty(id, varIdx);
 
   // pakai functional update agar tidak kena stale state saat tambah cepat/loop
   // juga batasi penambahan terhadap sisa stok
   let added = 0;
   setCartItems((prev) => {
     const cur = Number(prev[itemKey] || 0);
-    const remaining = Math.max(0, availableStock - cur);
-    const toAdd = Math.min(remaining, Math.max(1, Number(qty) || 1));
+        // remainingOverall sudah mengurangi cur (single) + semua bundling
+    const toAdd = Math.min(remainingOverall, Math.max(1, Number(qty) || 1));
+
     if (toAdd <= 0) {
       toast.warn("Stok tidak mencukupi");
       return prev;
@@ -96,8 +145,25 @@ const addToCart = async (itemKey, qty = 1) => {
         const variantStockByIndex = (food, varIdx) =>
           Number.isInteger(varIdx) ? Number(food?.varians?.[varIdx]?.varianStock || 0)
                                    : Number(food?.stock || 0);
+
+        // cek apakah menambah 1 paket masih muat stok semua komponen
+        const canIncreaseBundleOne = (bundle) => {
+          const byKey = new Map(); // `${foodId}|${varIdxOr-1}` -> count per paket
+          for (const sel of (bundle?.selections || [])) {
+            const key = `${sel.foodId}|${Number.isInteger(sel.varianIndex) ? sel.varianIndex : -1}`;
+            byKey.set(key, (byKey.get(key) || 0) + 1);
+          }
+          for (const [key, perPkg] of byKey) {
+            const [foodId, idxStr] = key.split("|");
+            const varIdx = Number(idxStr);
+            const varIdxVal = isNaN(varIdx) || varIdx < 0 ? undefined : varIdx;
+            const remaining = getRemainingQty(foodId, varIdxVal);
+            if (perPkg > remaining) return false;
+          }
+          return true;
+        };
         
-        const canAddBundleNow = (bundlePayload, food_list, cartItems, cartBundles) => {
+        const canAddBundleNow = (bundlePayload) => {
           // hitung pick per produk/varian dalam 1 paket
           const map = new Map(); // key = `${foodId}|${varIdx}`
           for (const sel of bundlePayload.selections || []) {
@@ -109,29 +175,10 @@ const addToCart = async (itemKey, qty = 1) => {
             const [foodId, idxStr] = key.split("|");
             const varIdx = Number(idxStr);
             const varIdxVal = isNaN(varIdx) || varIdx < 0 ? undefined : varIdx;
-        
-            const food = (food_list || []).find((f) => String(f._id) === String(foodId));
-            if (!food || food.isActive === false || food.inStock === false) return false;
-        
-            const stock = variantStockByIndex(food, varIdxVal);
-        
-            // reserved di cart (single)
-            let reserved = 0;
-            const vName = Number.isInteger(varIdxVal) ? (food?.varians?.[varIdxVal]?.varianName || "") : "";
-            if (vName) reserved += Number((cartItems || {})[`${foodId}_${vName}`] || 0);
-        
-            // reserved di cart (bundling) – kalikan quantity bundle
-            for (const b of (cartBundles || [])) {
-              const perPkgInB = (b.selections || []).filter(
-                (s) =>
-                  String(s.foodId) === String(foodId) &&
-                  ((s.varianIndex ?? -1) === (varIdxVal ?? -1))
-              ).length;
-              reserved += perPkgInB * Number(b.quantity || 1);
-            }
-        
-            const need = perPkg * Number(bundlePayload.quantity || 1);
-            if (reserved + need > stock) return false;
+            
+          const remaining = getRemainingQty(foodId, varIdxVal);
+          const need = perPkg * Number(bundlePayload.quantity || 1);
+          if (need > remaining) return false;
           }
           return true;
         };
@@ -415,6 +462,13 @@ const addToCart = async (itemKey, qty = 1) => {
       };
     
       const incBundleQty = async (id) => {
+                // guard: pastikan stok cukup untuk naik 1 paket
+          const bundle = (cartBundles || []).find(b => b.id === id);
+          if (!bundle) return;
+          if (!canIncreaseBundleOne(bundle)) {
+            try { toast.warn("Stok tidak mencukupi untuk menambah paket"); } catch {}
+            return;
+          }
         if (token) {
           const bundles = await updateBundleQtyServer(id, { delta: 1 });
           setCartBundles(bundles);
@@ -469,7 +523,10 @@ const addToCart = async (itemKey, qty = 1) => {
         fetchHampers,
         getBundleSubtotal,       
         setCartBundles,
-        loadCartData 
+        loadCartData, 
+        getReservedQty,
+        getRemainingQty,
+        canIncreaseBundleOne
     }
 
 

@@ -13,7 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const Cart = () => {
 
-  const {cartItems, food_list, addToCart,removeFromCart, getTotalCartAmount, getShippingCost, quantityItem, url, cartBundles, incBundleQty, decBundleQty} = useContext(StoreContext)
+  const {cartItems, food_list, addToCart,removeFromCart, getTotalCartAmount, quantityItem, url, cartBundles, incBundleQty, decBundleQty, getRemainingQty, canIncreaseBundleOne} = useContext(StoreContext)
 
   const navigate = useNavigate();
 
@@ -61,6 +61,7 @@ const Cart = () => {
       }
     })();
   
+    
     return () => {
       cancelled = true;
     };
@@ -98,6 +99,11 @@ const stableBundleKey = (b) => {
 
               const variant = product.varians?.find(v => v.varianName === varianName);
               const price = variant?.varianPrice || product.price;
+              // index varian & sisa stok realtime (single + bundling)
+              const varIdx = variant
+                ? (product.varians || []).findIndex(v => v.varianName === variant.varianName)
+                 : undefined;
+              const remaining = getRemainingQty(product._id, Number.isInteger(varIdx) ? varIdx : undefined);
 
               return (
                 <div key={`item:${itemKey}`}>
@@ -107,12 +113,23 @@ const stableBundleKey = (b) => {
                     <h3>{product.name} </h3>
                     <p>{variant ? `Varian: ${variant.varianName}` : ''}</p>
                     <p>{qty} x {price.toLocaleString("id-ID")}</p>
-                    <p>Stock: {variant ? variant.varianStock : product.stock}</p>
+                     <p>
+                       Stock: {variant ? remaining : product.stock}
+                       <span style={{ marginLeft: 8, color: "#888" }}></span>
+                     </p>
                     <div className='item-counter-cart-wrapper'>
                       <div className="item-counter-cart">
                         <FontAwesomeIcon icon={faMinus} onClick={() => removeFromCart(itemKey)} />
-                        <p>{cartItems[itemKey] || 0}</p>
-                        <FontAwesomeIcon icon={faPlus} onClick={() => addToCart(itemKey)} />
+                             <p>{cartItems[itemKey] || 0}</p>
+                             <button
+                               type="button"
+                               onClick={() => addToCart(itemKey)}
+                               disabled={remaining <= 0}
+                               title={remaining <= 0 ? "Stok habis" : "Tambah 1"}
+                               style={{ opacity: remaining <= 0 ? 0.5 : 1, cursor: remaining <= 0 ? "not-allowed" : "pointer", background: "transparent", border: "none", padding: 0 }}
+                             >
+                               <FontAwesomeIcon icon={faPlus} />
+                             </button>
                         
                       </div>
                       
@@ -151,7 +168,7 @@ const stableBundleKey = (b) => {
                     numbering.set(b.bundleId, current);
 
                     const displayName = `${b.name || "Hampers"} #${current}`;
-
+                    const canInc = canIncreaseBundleOne(b);
                     return (
                       <div key={k}>
                         <div className="cart-items-title cart-items-item">
@@ -179,7 +196,15 @@ const stableBundleKey = (b) => {
                               <div className="item-counter-cart">
                               <FontAwesomeIcon icon={faMinus} onClick={() => decBundleQty(b.id)}/>
                                 <p>{b.quantity}</p>
-                                <FontAwesomeIcon icon={faPlus} onClick={() => incBundleQty(b.id)}/>
+                                 <button
+                                   type="button"
+                                   onClick={() => incBundleQty(b.id)}
+                                   disabled={!canInc}
+                                   title={!canInc ? "Stok tidak mencukupi untuk menambah paket" : "Tambah 1"}
+                                   style={{ opacity: !canInc ? 0.5 : 1, cursor: !canInc ? "not-allowed" : "pointer", background: "transparent", border: "none", padding: 0 }}
+                                 >
+                                   <FontAwesomeIcon icon={faPlus} />
+                                 </button>
                               </div>
                             </div>
                           </div>
