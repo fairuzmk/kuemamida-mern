@@ -14,28 +14,15 @@ V.2.2.0
 V.2.2.1
 + Preloader Added
 
+V.2.3
++ Explore Menu Rombak total : FE, Dash, BE OKE
+    + isActive, isFeatured, inStock modified
+    + Category dinamis
+
+
 
 Next Feauture : 
-0. Menu Hampers Lebaran tambahkan syarat varian (dashboard)
-    0.1 Varian dijadikan menu options?
 
-1. Explore Menu rombak total
-
-    Kategori Jadikan Menu Options? 
-
-    - Best Seller
-    - Kue Ultah
-    - Kue Brownies
-    - Kue Bolen
-    - Kue Kering
-    - Kue Risol
-    - Cake Potong
-    - Snack Box
-
-2. Logika active, dan out of stock modifikasi 
-    - jika tidak active tidak tampil
-    - out of stock ketika stock kedua variannya habis
-    - 
 
 3. Search Bar
 
