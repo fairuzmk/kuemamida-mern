@@ -9,7 +9,7 @@ import { FaCartPlus } from "react-icons/fa6";
 
 export default function HamperDetailPage() {
   const { id } = useParams();
-  const { url, food_list, addBundleToCart } = useContext(StoreContext);
+  const { url, food_list, addBundleToCart, cartItems, cartBundles } = useContext(StoreContext);
 
   const [hamper, setHamper] = useState(null);
   const [quantity, setQuantity] = useState(1); // jumlah paket dibeli
@@ -23,6 +23,12 @@ export default function HamperDetailPage() {
     const arr = slot?.allowedVariants || [];
     return new Set(arr.map((x) => String(x).trim().toLowerCase()));
   };
+
+  const getCategoryId = (food) =>
+    typeof food?.category === "object" && food.category?._id
+      ? String(food.category._id)
+      : String(food?.category || "");
+
 
   // ambil detail hampers
   useEffect(() => {
@@ -52,23 +58,27 @@ export default function HamperDetailPage() {
   }, [id, url]);
 
   // kandidat produk per slot (byIds > byCategory)
-  const candidatesBySlot = useMemo(() => {
-    if (!hamper) return [];
-    return (hamper.slots || []).map((slot) => {
-      const byIds = slot.byIds || [];
-      const byCategory = slot.byCategory || [];
-      let candidates = food_list || [];
+ const candidatesBySlot = useMemo(() => {
+  if (!hamper) return [];
+  return (hamper.slots || []).map((slot) => {
+    const byIds = slot.byIds || [];
+    const byCategory = slot.byCategory || [];
+    let candidates = (food_list || [])
+      // hanya produk aktif
+      .filter((f) => f?.isActive);
 
-      if (byIds.length) {
-        const setIds = new Set(byIds.map(String));
-        candidates = candidates.filter((f) => setIds.has(String(f._id)));
-      } else if (byCategory.length) {
-        const setCats = new Set(byCategory);
-        candidates = candidates.filter((f) => setCats.has(f.category || ""));
-      }
-      return candidates;
-    });
-  }, [hamper, food_list]);
+    if (byIds.length) {
+      const setIds = new Set(byIds.map(String));
+      candidates = candidates.filter((f) => setIds.has(String(f._id)));
+    } else if (byCategory.length) {
+      const setCats = new Set(byCategory.map(String));
+      candidates = candidates.filter((f) => setCats.has(getCategoryId(f)));
+    }
+
+    return candidates;
+  });
+}, [hamper, food_list]);
+
 
   // ubah pilihan user (dengan auto-select 1 varian jika hanya satu yang valid)
   const setPick = (slotIdx, pickIdx, field, value) => {
@@ -163,18 +173,127 @@ export default function HamperDetailPage() {
     }
   };
 
-  const addToCartBundle =
-    typeof addBundleToCart === "function"
-      ? addBundleToCart
-      : (bp) => {
-          const raw = localStorage.getItem("cartBundles");
-          const cur = raw ? JSON.parse(raw) : [];
-          const key = JSON.stringify({ bundleId: bp.bundleId, selections: bp.selections });
-          const idx = cur.findIndex((x) => x._key === key);
-          if (idx >= 0) cur[idx].quantity = (cur[idx].quantity || 1) + (bp.quantity || 1);
-          else cur.push({ ...bp, _key: key, id: String(Date.now()) });
-          localStorage.setItem("cartBundles", JSON.stringify(cur));
-        };
+    // stok varian vs stok total produk
+    const getVariantStock = (food, varIdx) =>
+      Number.isInteger(varIdx) ? Number(food?.varians?.[varIdx]?.varianStock || 0)
+                                : Number(food?.stock || 0);
+    
+    const getVariantName = (food, varIdx) =>
+      Number.isInteger(varIdx) ? String(food?.varians?.[varIdx]?.varianName || "") : "";
+
+
+
+      // --- snapshot cartItems (context atau localStorage)
+      const getCartItemsSnapshot = () => {
+        if (cartItems && typeof cartItems === "object") return cartItems;
+        try { return JSON.parse(localStorage.getItem("cartItems") || "{}"); } catch { return {}; }
+      };
+
+      // berapa unit sudah “terpesan” di cart (single + bundling) untuk foodId/varIdx ini
+      const getAlreadyReserved = (foodId, varIdx) => {
+        let sum = 0;
+
+        // single product (key: `${foodId}_${varianName}`)
+        try {
+          const food = (food_list || []).find(f => String(f._id) === String(foodId));
+          const vName = getVariantName(food, varIdx);
+          if (vName) sum += Number((cartItems || {})[`${foodId}_${vName}`] || 0);
+        } catch {}
+
+        // bundling dari STATE (bukan localStorage) → kalikan quantity bundle
+        try {
+          for (const b of (cartBundles || [])) {
+            const perPkg = (b.selections || []).filter(
+              (sel) =>
+                String(sel.foodId) === String(foodId) &&
+                ((sel.varianIndex ?? -1) === (Number.isInteger(varIdx) ? varIdx : -1))
+            ).length;
+            sum += perPkg * Number(b.quantity || 1);
+          }
+        } catch {}
+
+        return sum;
+      };
+
+      // utility kecil
+      const keyFor = (foodId, varIdx) =>
+        `${foodId}|${Number.isInteger(varIdx) ? varIdx : -1}`;
+
+      // pastikan stok cukup untuk bundle yang akan ditambahkan (hitung pick sejenis)
+      const ensureBundleRoom = (bp) => {
+        // hitung pick per produk/varian dalam 1 paket
+        const addMap = new Map(); // key => jumlah pick per paket
+        for (const sel of bp.selections || []) {
+          const k = keyFor(sel.foodId, sel.varianIndex);
+          addMap.set(k, (addMap.get(k) || 0) + 1);
+        }
+
+        for (const [k, perPkgCount] of addMap) {
+          const [foodId, idxStr] = k.split("|");
+          const varIdx = Number(idxStr);
+          const varIdxVal = isNaN(varIdx) || varIdx < 0 ? undefined : varIdx;
+
+          const food = (food_list || []).find((f) => String(f._id) === String(foodId));
+          if (!food) return false;
+
+          const stock = getVariantStock(food, varIdxVal);
+          const reserved = getAlreadyReserved(foodId, varIdxVal);
+          const need = perPkgCount * Number(bp.quantity || 1);
+          const after = reserved + need;
+
+          if (after > stock) {
+            const vName = getVariantName(food, varIdxVal);
+            const sisa = Math.max(0, stock - reserved);
+            toast.warn(`Stok ${food.name}${vName ? ` (${vName})` : ""} tersisa ${sisa}`);
+            return false;
+          }
+        }
+        return true;
+      };
+
+
+
+    const canBuy = (food, varIdx) => {
+      // optional: hormati flag aktif & inStock kalau ada
+      if (food?.isActive === false) return false;
+      if (food?.inStock === false) return false;
+      return getVariantStock(food, varIdx) > 0;
+    };
+
+    // validasi seluruh pilihan di bundle
+    const validateBundleStock = (bp) => {
+      for (const pick of bp?.selections || []) {
+        const food = (food_list || []).find(f => String(f._id) === String(pick.foodId));
+        if (!food || !canBuy(food, pick.varianIndex)) return false;
+      }
+      return true;
+    };
+
+     const addToCartBundle =
+       typeof addBundleToCart === "function"
+         ? async (bp) => {
+             if (!validateBundleStock(bp)) {
+               toast.warn("Ada item hampers yang stoknya habis / tidak aktif");
+               return false; // << batal
+             }
+             if (!ensureBundleRoom(bp)) return;
+             await Promise.resolve(addBundleToCart(bp));
+             return true;    // << sukses
+           }
+         : async (bp) => {
+             if (!validateBundleStock(bp)) {
+               toast.warn("Ada item hampers yang stoknya habis / tidak aktif");
+               return false; // << batal
+             }
+             const raw = localStorage.getItem("cartBundles");
+             const cur = raw ? JSON.parse(raw) : [];
+             const key = JSON.stringify({ bundleId: bp.bundleId, selections: bp.selections });
+             const idx = cur.findIndex((x) => x._key === key);
+             if (idx >= 0) cur[idx].quantity = (cur[idx].quantity || 1) + (bp.quantity || 1);
+             else cur.push({ ...bp, _key: key, id: String(Date.now()) });
+             localStorage.setItem("cartBundles", JSON.stringify(cur));
+             return true;    // << sukses
+           };
 
   // tambah ke keranjang
   const handleAddToCart = async () => {
@@ -192,8 +311,10 @@ export default function HamperDetailPage() {
     }
     try {
       setAdding(true);
-      await Promise.resolve(addToCartBundle(bp)); // jaga-jaga kalau nanti async
-      toast.success("Hampers ditambahkan ke keranjang");
+           const ok = await Promise.resolve(addToCartBundle(bp));
+     if (ok) {
+       toast.success("Hampers ditambahkan ke keranjang");
+     }
     } catch (e) {
       toast.error("Gagal menambahkan ke keranjang");
     } finally {

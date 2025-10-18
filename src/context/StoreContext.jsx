@@ -29,49 +29,6 @@ const StoreContextProvider = (props) => {
     const [hampersPagination, setHampersPagination] = useState(null);
     
 
-  //   const addToCart = async (itemKey) => {
-  //     const [id, varianName] = itemKey.split("_");
-  
-  //     // Cari item berdasarkan ID dari food_list
-  //     const itemInfo = food_list.find((product) => product._id === id);
-  
-  //     if (!itemInfo) {
-  //         toast.error("Produk tidak ditemukan");
-  //         return;
-  //     }
-  
-  //     // Ambil stock berdasarkan varian (jika ada) atau stock utama
-  //     let availableStock = 0;
-  //     if (varianName) {
-  //         const varian = itemInfo.varians?.find(v => v.varianName === varianName);
-  //         if (!varian) {
-  //             toast.error("Varian tidak ditemukan");
-  //             return;
-  //         }
-  //         availableStock = varian.varianStock;
-  //     } else {
-  //         availableStock = itemInfo.stock;
-  //     }
-  
-  //     const currentQty = cartItems[itemKey] || 0;
-  
-  //     // Proteksi: tidak boleh melebihi stock
-  //     if (currentQty >= availableStock) {
-  //         toast.warn("Stok tidak mencukupi");
-  //         return;
-  //     }
-  
-  //     // Tambah ke cart
-  //     setCartItems((prev) => ({
-  //         ...prev,
-  //         [itemKey]: currentQty + 1,
-  //     }));
-  
-  //     // Sync ke backend kalau ada token
-  //     if (token) {
-  //         await axios.post(url + "/api/cart/add", { itemKey }, { headers: { token } });
-  //     }
-  // };
 
 
   // === Cart product (single) ===
@@ -134,6 +91,49 @@ const addToCart = async (itemKey, qty = 1) => {
         if (token) {
             await axios.post(url+"/api/cart/remove", {itemKey}, {headers: {token}})
         }
+        };
+
+        const variantStockByIndex = (food, varIdx) =>
+          Number.isInteger(varIdx) ? Number(food?.varians?.[varIdx]?.varianStock || 0)
+                                   : Number(food?.stock || 0);
+        
+        const canAddBundleNow = (bundlePayload, food_list, cartItems, cartBundles) => {
+          // hitung pick per produk/varian dalam 1 paket
+          const map = new Map(); // key = `${foodId}|${varIdx}`
+          for (const sel of bundlePayload.selections || []) {
+            const key = `${sel.foodId}|${Number.isInteger(sel.varianIndex) ? sel.varianIndex : -1}`;
+            map.set(key, (map.get(key) || 0) + 1);
+          }
+        
+          for (const [key, perPkg] of map) {
+            const [foodId, idxStr] = key.split("|");
+            const varIdx = Number(idxStr);
+            const varIdxVal = isNaN(varIdx) || varIdx < 0 ? undefined : varIdx;
+        
+            const food = (food_list || []).find((f) => String(f._id) === String(foodId));
+            if (!food || food.isActive === false || food.inStock === false) return false;
+        
+            const stock = variantStockByIndex(food, varIdxVal);
+        
+            // reserved di cart (single)
+            let reserved = 0;
+            const vName = Number.isInteger(varIdxVal) ? (food?.varians?.[varIdxVal]?.varianName || "") : "";
+            if (vName) reserved += Number((cartItems || {})[`${foodId}_${vName}`] || 0);
+        
+            // reserved di cart (bundling) – kalikan quantity bundle
+            for (const b of (cartBundles || [])) {
+              const perPkgInB = (b.selections || []).filter(
+                (s) =>
+                  String(s.foodId) === String(foodId) &&
+                  ((s.varianIndex ?? -1) === (varIdxVal ?? -1))
+              ).length;
+              reserved += perPkgInB * Number(b.quantity || 1);
+            }
+        
+            const need = perPkg * Number(bundlePayload.quantity || 1);
+            if (reserved + need > stock) return false;
+          }
+          return true;
         };
 
         // Hitung subtotal 1 bundle (sudah x quantity bundle)
@@ -380,6 +380,11 @@ const addToCart = async (itemKey, qty = 1) => {
 
       const addBundleToCart = async (bundlePayload) => {
         // bundlePayload: { bundleId, name, quantity, selections }
+         // cegah melebihi stok (gabungan single + bundling yang sudah ada)
+        if (!canAddBundleNow(bundlePayload, food_list, cartItems, cartBundles)) {
+          try { toast.warn("Stok paket melebihi stok tersedia"); } catch {}
+          return;
+        }
         if (token) {
           // simpan di server
           await addBundleToCartServer({
@@ -392,7 +397,7 @@ const addToCart = async (itemKey, qty = 1) => {
           // ambil ulang dari server
           const res = await axios.post(`${url}/api/cart/get`, {}, { headers: { token } });
           setCartBundles(res.data?.cartBundles || []);
-          toast.success("Hampers ditambahkan ke keranjang");
+          
           return;
         }
       
