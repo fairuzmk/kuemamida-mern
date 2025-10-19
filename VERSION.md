@@ -23,6 +23,10 @@ V.2.3
     + Bug Fixed (Available Stock --> Store Context)
     + Bug Fixed (Protected Route support Cartitem/cartbundles)
 
+V.2.4
++ Notification Push Feature Added
+
+
 
 
 Next Feauture : 
