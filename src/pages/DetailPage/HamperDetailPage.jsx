@@ -89,27 +89,31 @@ export default function HamperDetailPage() {
       if (field === "foodId") {
         // reset varian jika ganti produk
         next[slotIdx].picks[pickIdx].varianIndex = undefined;
-
-        // auto-select bila hanya ada 1 varian yang valid
+      
         const slotRule = hamper?.slots?.[slotIdx];
         const food = (food_list || []).find((f) => f._id === value);
+      
+        // AUTO-SELECT: ambil varian valid pertama (izinkan + stok > 0)
         if (slotRule?.allowVariants && food?.varians?.length) {
-          const allowedSet = getAllowedVariantSet(slotRule);
-          if (allowedSet.size > 0) {
-            const candidates = food.varians
-              .map((v, i) => ({ v, i }))
-              .filter(({ v }) =>
-                allowedSet.has(String(v.varianName || "").trim().toLowerCase())
-              );
-               if (candidates.length === 1) {
-                  const only = candidates[0];
-                   if (getRemainingQty(food._id, only.i) > 0) {
-                     next[slotIdx].picks[pickIdx].varianIndex = only.i;
-                   }
-                 }
+          const allowedSet = getAllowedVariantSet(slotRule); // nama varian lowercase
+          const all = food.varians.map((v, i) => ({ v, i }));
+          const filteredByAllowed =
+            allowedSet.size > 0
+              ? all.filter(({ v }) =>
+                  allowedSet.has(String(v.varianName || "").trim().toLowerCase())
+                )
+              : all;
+      
+          const filteredInStock = filteredByAllowed.filter(
+            ({ i }) => getRemainingQty(food._id, i) > 0
+          );
+      
+          if (filteredInStock.length > 0) {
+            next[slotIdx].picks[pickIdx].varianIndex = filteredInStock[0].i;
           }
         }
       }
+      
 
       return next;
     });
