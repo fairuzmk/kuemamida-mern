@@ -16,7 +16,8 @@ import { FaMoneyBill, FaMoneyCheck, FaTruck } from 'react-icons/fa';
 const PlaceOrder = () => {
   const navigate = useNavigate();
 
-  const {getTotalCartAmount, quantityItem, cartItems, food_list, url, options, fetchOptions, setCartItems, token, cartBundles, setCartBundles, loadCartData} = useContext(StoreContext);
+  const {getTotalCartAmount, quantityItem, cartItems, food_list, url, options, fetchOptions, setCartItems, token, cartBundles, voucher,
+    getDiscount, setCartBundles, loadCartData} = useContext(StoreContext);
 
   
    const [user, setUser] = useState({ name: "", address: "", phone:"" });
@@ -105,19 +106,30 @@ const PlaceOrder = () => {
         return;
       }
 
+    // NEW: VOUCHER — hitung subtotal & diskon dari context
+    const subtotal = Number(getTotalCartAmount() || 0);
+    const discount = Number(getDiscount ? getDiscount() : 0);
+    const ship = Number(selectedShipping.price || 0);
+
 
     const payload = {
-      items,                     // produk single
-      bundles,                   // paket hampers
-      amount: getTotalCartAmount(),
-      shipping_fee: selectedShipping.price,
+      items,
+      bundles,
+      amount: subtotal,               // subtotal sebelum ongkir & diskon (kalau kamu memang memakainya)
+      shipping_fee: ship,
       shipping_method: selectedShipping.value,
       payment_method: payment_method.value,
       address: {
-        name:user.name,
+        name: user.name,
         phone: user.phone,
         detail: user.address,
-      }
+      },
+      // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      // NEW: VOUCHER — sertakan voucher ke payload
+      voucherCode: voucher?.code || null,
+      voucherDiscount: discount || 0, // opsional; server sebaiknya tetap re-validate
+      clientSubtotal: subtotal,       // opsional; untuk logging/diagnostik
+      // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     };
   
     try {
@@ -212,28 +224,51 @@ const PlaceOrder = () => {
       <div className="place-order-right">
         <div className="cart-total">
           <h2>Total Belanja</h2>
+
           <div className="cart-total-details">
-            <p>Sub Total ( {quantityItem()} items ) </p>
+            <p>Sub Total ({quantityItem()} items)</p>
             <p>Rp {getTotalCartAmount().toLocaleString("id-ID")}</p>
           </div>
+
+          {/* NEW: VOUCHER — tampilkan jika ada diskon */}
+          {Number(getDiscount ? getDiscount() : 0) > 0 && (
+            <>
+              <hr />
+              <div className="cart-total-details">
+                <p>Diskon Voucher {voucher?.code ? `(${voucher.code})` : ""}</p>
+                <p>- Rp {Number(getDiscount()).toLocaleString("id-ID")}</p>
+              </div>
+            </>
+          )}
+
           <hr />
           <div className="cart-total-details">
-            <p>Ongkos Kirim </p>
-            <p>Rp. {selectedShipping.price.toLocaleString("id-ID")}</p>
+            <p>Ongkos Kirim</p>
+            <p>Rp {Number(selectedShipping.price || 0).toLocaleString("id-ID")}</p>
           </div>
+
           <div className="cart-total-details">
-          {selectedShipping.value}
+            <span style={{ color: "#666", fontSize: 12 }}>{selectedShipping.value}</span>
           </div>
-          
+
           <hr />
           <div className="cart-total-details">
             <b>Total</b>
-            <p>Rp. {(getTotalCartAmount()+selectedShipping.price).toLocaleString("id-ID")}</p>
+            <p>
+              Rp{" "}
+              {(
+                Number(getTotalCartAmount() || 0) -
+                Number(getDiscount ? getDiscount() : 0) +
+                Number(selectedShipping.price || 0)
+              ).toLocaleString("id-ID")}
+            </p>
           </div>
+
           <div className='cart-total-button'>
-          <button type='submit' disabled={isLoading}><FontAwesomeIcon icon={faCreditCard}/> {isLoading?("Processing.."):("PROCEED TO PAYMENT")} </button>
+            <button type='submit' disabled={isLoading}>
+              <FontAwesomeIcon icon={faCreditCard}/> {isLoading ? "Processing.." : "PROCEED TO PAYMENT"}
+            </button>
           </div>
-          
         </div>
       </div>
     </form>

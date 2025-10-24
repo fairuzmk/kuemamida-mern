@@ -27,6 +27,11 @@ V.2.4
 + Notification Push Feature Added
 
 
+V.2.5
++ Dashboard admin calendar order added
++ Voucher has been implemented (Need testing)
+
+
 
 
 Next Feauture : 

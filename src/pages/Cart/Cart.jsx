@@ -8,17 +8,19 @@ import { useNavigate } from 'react-router-dom';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
- import { useEffect, useState } from 'react';
+ import { useEffect, useState, useMemo } from 'react';
  import axios from 'axios';
+import { VoucherCoupons } from './VoucherCoupons';
 
 const Cart = () => {
 
-  const {cartItems, food_list, addToCart,removeFromCart, getTotalCartAmount, quantityItem, url, cartBundles, incBundleQty, decBundleQty, getRemainingQty, canIncreaseBundleOne} = useContext(StoreContext)
+  const {cartItems, food_list, addToCart,removeFromCart, getTotalCartAmount, quantityItem, url, cartBundles, incBundleQty, decBundleQty, getRemainingQty, canIncreaseBundleOne, voucher, applyVoucher, clearVoucher, getDiscount, getGrandTotal} = useContext(StoreContext)
 
   const navigate = useNavigate();
 
 
   const [bundleAmounts, setBundleAmounts] = React.useState({});
+  const [voucherInput, setVoucherInput] = useState(() => voucher?.code || "");
 
   useEffect(() => {
     let cancelled = false;
@@ -81,7 +83,75 @@ const stableBundleKey = (b) => {
   return `bundle:${id}:${sig}`;
 };
 
-  
+          // ====== STATE & HELPER VOUCHER LIST ======
+        
+        const [vouchers, setVouchers] = useState([]);
+        const [loadingVouchers, setLoadingVouchers] = useState(true);
+
+        const subtotal = getTotalCartAmount();
+
+        // Ambil list voucher dari backend
+        useEffect(() => {
+          let mounted = true;
+          (async () => {
+            try {
+              setLoadingVouchers(true);
+              const res = await axios.get(`${url}/api/vouchers`);
+              const all = res.data?.data || [];
+              if (!mounted) return;
+              setVouchers(all);
+            } catch (e) {
+              console.error(e);
+              if (!mounted) setVouchers([]);
+            } finally {
+              if (mounted) setLoadingVouchers(false);
+            }
+          })();
+          return () => { mounted = false; };
+        }, [url]);
+
+        // Cek eligibility di sisi frontend (aktif, belum expired, limit belum habis, min_purchase <= subtotal)
+        const isEligible = (v) => {
+          const now = Date.now();
+          const notExpired = !v.expired_at || new Date(v.expired_at).getTime() >= now;
+          const underLimit =
+            !(typeof v.usage_limit === "number" && typeof v.used_count === "number" && v.usage_limit > 0)
+              || v.used_count < v.usage_limit;
+          const active = Boolean(v.is_active);
+          const meetMin = Number(subtotal) >= Number(v.min_purchase || 0);
+          return active && notExpired && underLimit && meetMin;
+        };
+
+        // Tampilkan dulu yang eligible di depan
+        const sortedVouchers = useMemo(() => {
+          const arr = Array.isArray(vouchers) ? [...vouchers] : [];
+          return arr.sort((a, b) => {
+            const ea = isEligible(a) ? 0 : 1;
+            const eb = isEligible(b) ? 0 : 1;
+            if (ea !== eb) return ea - eb; // eligible duluan
+            // kemudian urutkan yang segera kadaluarsa duluan
+            const ta = a.expired_at ? new Date(a.expired_at).getTime() : Infinity;
+            const tb = b.expired_at ? new Date(b.expired_at).getTime() : Infinity;
+            return ta - tb;
+          });
+        }, [vouchers, subtotal]);
+
+        // Format helper
+        const fmtRp = (n) => (Number(n || 0)).toLocaleString("id-ID", { maximumFractionDigits: 0 });
+        const fmtDate = (s) => {
+          if (!s) return "-";
+          const d = new Date(s);
+          if (isNaN(d.getTime())) return "-";
+          const dd = String(d.getDate()).padStart(2, "0");
+          const mm = String(d.getMonth() + 1).padStart(2, "0");
+          const yy = d.getFullYear();
+          return `${dd}-${mm}-${yy}`;
+        };
+        const diskonLabel = (v) =>
+          v.type === "percentage" ? `${v.value}%` : `Rp ${fmtRp(v.value)}`;
+
+        // ====== UI SECTION: Voucher Cards ======
+
 
   return (
     <div className='cart'>
@@ -231,67 +301,58 @@ const stableBundleKey = (b) => {
         <div className="cart-total">
           <h2>Total Belanja</h2>
           <div className="cart-total-details">
-            <p>Sub Total ( {quantityItem()} items ) </p>
-            {/* <p>Sub Total </p> */}
+            <p>Sub Total ({quantityItem()} items)</p>
             <p>Rp {(getTotalCartAmount()).toLocaleString("id-ID")}</p>
           </div>
           <hr />
           <div className="cart-total-details">
-            <p>Diskon</p>
-            <p>{getTotalCartAmount()===0?0:0}</p>
+            <p>Diskon {voucher?.code ? `(kode: ${voucher.code})` : ""}</p>
+            <p>- Rp {getDiscount().toLocaleString("id-ID")}</p>
           </div>
           <hr />
           <div className="cart-total-details">
             <b>Total</b>
-            <p>Rp. {(getTotalCartAmount()).toLocaleString("id-ID")}</p>
+            <p>Rp. {getGrandTotal().toLocaleString("id-ID")}</p>
           </div>
           <div className='cart-total-button'>
-          <button onClick={() => navigate('/order')}
-            disabled={isCartEmpty}
-            style={{ opacity: isCartEmpty ? 0.5 : 1, cursor: isCartEmpty ? 'not-allowed' : 'pointer' }}><FontAwesomeIcon icon={faTruckFast}/> CHECKOUT</button>
+            <button onClick={() => navigate('/order')}
+              disabled={isCartEmpty}
+              style={{ opacity: isCartEmpty ? 0.5 : 1, cursor: isCartEmpty ? 'not-allowed' : 'pointer' }}>
+              <FontAwesomeIcon icon={faTruckFast}/> CHECKOUT
+            </button>
           </div>
-          
         </div>
+
+
       </div>
       
-       
       <div className="cart-bottom">
-        
-        {/* VOUCHER DISKON */}
-        <div className="cart-promocode">
-          
-          <div>
-            <p>VOUCHER DISKON</p>
-            <div>
-              <div className="cart-promocode-input">
-                <input type="text" placeholder='Kode Voucher' />
-                <button>Apply</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        
+      
+      <VoucherCoupons/>
+      
       </div>
+      
+
+
+
+
       
       <div className="cart-total-float">
         <div>
           <p>Total ({quantityItem()} items):</p>
-          <p>Rp. {(getTotalCartAmount()).toLocaleString("id-ID")}</p>
+          <p>Rp. {getGrandTotal().toLocaleString("id-ID")}</p>
         </div>
         <div className='cart-total-button'>
-        <button
-          
-          onClick={() => navigate('/order')}
-          disabled={isCartEmpty}
-          style={{
-            opacity: isCartEmpty ? 0.5 : 1, cursor: isCartEmpty ? 'not-allowed' : 'pointer'
-          }}
-        >
-          <FontAwesomeIcon icon={faTruckFast}/> CHECKOUT
-        </button>
+          <button
+            onClick={() => navigate('/order')}
+            disabled={isCartEmpty}
+            style={{ opacity: isCartEmpty ? 0.5 : 1, cursor: isCartEmpty ? 'not-allowed' : 'pointer' }}
+          >
+            <FontAwesomeIcon icon={faTruckFast}/> CHECKOUT
+          </button>
         </div>
-        
       </div>
+
     </div>
   )
 }

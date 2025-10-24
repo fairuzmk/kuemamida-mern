@@ -17,9 +17,9 @@ const StoreContextProvider = (props) => {
 
     // const url = "https://kuemamida-backend.onrender.com";
     
-    const url = "https://kuemamida.milkioserver.my.id";
+    // const url = "https://kuemamida.milkioserver.my.id";
 
-    // const url = "http://localhost:4000";
+    const url = "http://localhost:4000";
     const [token, setToken] = useState(() => {
         return localStorage.getItem("token") || "";
     });
@@ -507,6 +507,81 @@ const addToCart = async (itemKey, qty = 1) => {
         setCartBundles((prev) => prev.filter((b) => b.id !== id));
       };
 
+      // === Voucher state ===
+      const [voucher, setVoucher] = useState(() => {
+        try { return JSON.parse(localStorage.getItem("activeVoucher")) || null; } catch { return null; }
+      });
+
+      const getCartSubtotal = () => getTotalCartAmount(); // alias, biar jelas niatnya
+      const getDiscount = () => Math.max(0, Number(voucher?.discount || 0));
+      const getGrandTotal = () => Math.max(0, getCartSubtotal() - getDiscount());
+
+      // Terapkan voucher (validasi ke backend)
+      const applyVoucher = async (code) => {
+        const cartTotal = getCartSubtotal();
+        if (!code || cartTotal <= 0) {
+          toast.warn("Keranjang masih kosong");
+          return { ok: false };
+        }
+        try {
+          const res = await axios.post(`${url}/api/vouchers/validate`, { code, cartTotal });
+          if (res.data?.valid) {
+            const v = {
+              code: code.toUpperCase(),
+              discount: Number(res.data.discount || 0),
+              finalPrice: Number(res.data.finalPrice || cartTotal),
+              message: res.data.message,
+            };
+            setVoucher(v);
+            localStorage.setItem("activeVoucher", JSON.stringify(v));
+            toast.success(v.message || "Voucher diterapkan");
+            return { ok: true, voucher: v };
+          }
+          toast.error(res.data?.message || "Voucher tidak valid");
+          return { ok: false };
+        } catch (e) {
+          toast.error(e?.response?.data?.message || "Gagal memvalidasi voucher");
+          return { ok: false };
+        }
+      };
+
+      // Hapus voucher aktif
+      const clearVoucher = () => {
+        setVoucher(null);
+        localStorage.removeItem("activeVoucher");
+        toast.info("Voucher dibatalkan");
+      };
+
+      // Re-validate otomatis kalau subtotal berubah (mis: item ditambah/kurang)
+      useEffect(() => {
+        (async () => {
+          if (!voucher?.code) return;
+          const cartTotal = getCartSubtotal();
+          try {
+            const res = await axios.post(`${url}/api/vouchers/validate`, {
+              code: voucher.code,
+              cartTotal,
+            });
+            if (res.data?.valid) {
+              const v = {
+                code: voucher.code,
+                discount: Number(res.data.discount || 0),
+                finalPrice: Number(res.data.finalPrice || cartTotal),
+                message: res.data.message,
+              };
+              setVoucher(v);
+              localStorage.setItem("activeVoucher", JSON.stringify(v));
+            } else {
+              clearVoucher(); // otomatis batal kalau sudah tak valid (min purchase turun, kadaluarsa, dll)
+            }
+          } catch {
+            clearVoucher();
+          }
+        })();
+        // pakai subtotal & struktur cart sebagai dependensi
+      }, [cartItems, cartBundles]); // eslint-disable-line react-hooks/exhaustive-deps
+
+
 
     const contextValue = {
         food_list,
@@ -534,7 +609,12 @@ const addToCart = async (itemKey, qty = 1) => {
         loadCartData, 
         getReservedQty,
         getRemainingQty,
-        canIncreaseBundleOne
+        canIncreaseBundleOne,
+        voucher,
+        applyVoucher,
+        clearVoucher,
+        getDiscount,
+        getGrandTotal,
     }
 
 
