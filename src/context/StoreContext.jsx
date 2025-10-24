@@ -207,21 +207,29 @@ const addToCart = async (itemKey, qty = 1) => {
           const base = Number(h.basePrice || 0);
           const disc = Number(h.discountAmount || 0);
 
-          let amount = 0;
+          
+          let amountPerBundle = 0;
+
           switch (h.pricingMode) {
             case "FIXED":
-              amount = base * q;
+              amountPerBundle = base; // harga paket tetap per bundle
               break;
+
             case "SUM_MINUS_DISCOUNT":
-              amount = Math.max(0, (sumItems * q) - disc);
+              // (sum items - discount) per bundle
+              amountPerBundle = Math.max(0, sumItems - disc);
               break;
+
             case "BASE_PLUS_ITEMS":
-              amount = Math.max(0, ((base + sumItems) * q) - disc);
+              // ((base + sum items) - discount) per bundle
+              amountPerBundle = Math.max(0, base + sumItems - disc);
               break;
+
             default:
-              amount = base * q; // fallback
+              amountPerBundle = Math.max(0, base + sumItems - disc);
           }
-          return amount;
+
+          return amountPerBundle * q;
         };
 
 
