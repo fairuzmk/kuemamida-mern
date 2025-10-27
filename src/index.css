@@ -1,5 +1,6 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Oswald:wght@200..700&family=Oxanium:wght@200..800&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Acme&family=Alan+Sans:wght@300..900&display=swap');
 
 
 :root {
@@ -7,8 +8,8 @@
   --secondary-color: #e0e4d9;
   --background-primary: #f3d7d7;
   --text-color: #333333;
-  --navbar-font: "Inter", sans-serif;
-  --heading-font: "Oswald", sans-serif;
+  --navbar-font: "Alan Sans", sans-serif;
+  --heading-font: "Acme", sans-serif;
 }
 
 *{
@@ -23,9 +24,15 @@ body {
   min-height: 100vh;
   font-family: var(--navbar-font);
 }
-a{
+a
+{
   text-decoration: none;
   color: inherit;
+}
+
+heading, h1, h2, h3, h4, h5, h6 {
+  font-family: var(--heading-font);
+  color: var(--text-color);
 }
 
 .app{
