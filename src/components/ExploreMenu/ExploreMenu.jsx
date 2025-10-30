@@ -32,7 +32,7 @@ const ExploreMenu = ({ category, setCategory }) => {
           >
             <div >
               <img
-                src="https://res.cloudinary.com/diotafsul/image/upload/v1760760632/Menukuemamidaicon_allproduct_sfns4o.png"
+                src="https://res.cloudinary.com/diotafsul/image/upload/v1761804736/Gemini_Generated_Image_d8pqdrd8pqdrd8pq_bgnjqz.png"
                 alt="All Product"
                 className={['All', 'All Product'].includes(category) ? 'active' : ''}
               />
@@ -46,7 +46,7 @@ const ExploreMenu = ({ category, setCategory }) => {
           >
             <div >
               <img
-                src="https://res.cloudinary.com/diotafsul/image/upload/v1760760906/Menukuemamidaicon_bestsale_eepluu.png"
+                src="https://res.cloudinary.com/diotafsul/image/upload/v1761804736/Gemini_Generated_Image_kle7uukle7uukle7_uke11i.png"
                 alt="Featured"
                 className={category === 'Featured' ? 'active' : ''}
               />
