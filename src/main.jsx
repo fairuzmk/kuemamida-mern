@@ -10,6 +10,10 @@ import NProgress from "nprogress";
 import "nprogress/nprogress.css";   // default styles
 import "./nprogress-theme.css";     // overrides, harus setelahnya
 import React from "react";
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+
 
 NProgress.configure({ showSpinner: false, trickleSpeed: 120, minimum: 0.08 });
 

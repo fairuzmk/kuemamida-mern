@@ -1,18 +1,100 @@
-import React from 'react'
-import './LebaranHeader.css'
+// Header.jsx
+import React from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 
-const LebaranHeader = () => {
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+
+import './Header.css';
+
+const Header = ({ slides = [] }) => {
+  const defaultSlides = [
+    {
+      id: 1,
+      imageUrl:
+        'https://images.unsplash.com/photo-1574344069030-b2926f1b3d06?q=80&w=1933&auto=format&fit=crop',
+      title: 'Order your favourite cake here',
+      description:
+        'Di balik setiap kue yang kami sajikan, ada proses yang penuh cinta dan perhatian. Kami percaya bahwa kue yang baik bukan hanya soal rasa—tetapi juga soal pengalaman dan kehangatan yang menyertainya.',
+      buttonText: 'Lihat Menu Kue',
+      buttonLink: '#food-display',
+    },
+    {
+      id: 2,
+      imageUrl:
+        'https://images.unsplash.com/photo-1541971271026-2f16f0339d89?q=80&w=1933&auto=format&fit=crop',
+      title: 'Kue Custom untuk Momen Spesial',
+      description:
+        'Rayakan ulang tahun, anniversary, atau acara keluarga dengan kue custom yang bisa kamu desain sendiri.',
+      buttonText: 'Pesan Kue Custom',
+      buttonLink: '/custom-order',
+    },
+    {
+      id: 3,
+      imageUrl:
+        'https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?q=80&w=1933&auto=format&fit=crop',
+      title: 'Fresh from the Oven',
+      description:
+        'Semua kue dibuat fresh setiap hari dengan bahan berkualitas, tanpa stok lama di chiller.',
+      buttonText: 'Hubungi Kami',
+      buttonLink: '/contact',
+    },
+  ];
+
+  const dataToUse = slides.length ? slides : defaultSlides;
+
+  const handleButtonClick = (slide) => {
+    if (!slide.buttonLink) return;
+
+    if (slide.buttonLink.startsWith('#')) {
+      const el = document.querySelector(slide.buttonLink);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.location.href = slide.buttonLink;
+    }
+  };
+
   return (
-    <div className='header-lebaran' id='header-lebaran-section'>
-        
-        <div className="header-lebaran-content">
-            <h2>Selamat Lebaran 1447 H</h2>
-            <p>Selamat menunaikan ibadah puasa dan lebaran. Mohon maaf lahir dan batin. Minal Aidzin Wal Faizin</p>
-            
-        </div>
+    <div className="header" id="header-section">
+      <Swiper
+        modules={[Navigation, Pagination, Autoplay]}
+        slidesPerView={1}
+        loop={true}
+        autoplay={{
+          delay: 5000,
+          disableOnInteraction: false,
+        }}
+        pagination={{ clickable: true }}
+        navigation={false} // bisa kamu ubah ke true kalau mau next/prev button
+        speed={800}
+        className="header-swiper"
+      >
+        {dataToUse.map((slide) => (
+          <SwiperSlide key={slide.id}>
+            <div
+              className="header-slide"
+              style={{
+                backgroundImage: `url(${slide.imageUrl})`,
+              }}
+            >
+              <div className="header-overlay" />
+              <div className="header-content">
+                <h2>{slide.title}</h2>
+                {slide.description && <p>{slide.description}</p>}
+                {/* {slide.buttonText && (
+                  <button onClick={() => handleButtonClick(slide)}>
+                    {slide.buttonText}
+                  </button>
+                )} */}
+              </div>
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </div>
+  );
+};
 
-  )
-}
-
-export default LebaranHeader
+export default Header;
