@@ -148,7 +148,7 @@
           });
 
           // fallback jika 'load' tak terpanggil dalam 20s
-          setTimeout(function(){ if (target < 100) target = 100; }, 20000);
+          setTimeout(function(){ if (target < 100) target = 100; tick(); }, 5000);
         } catch (e) {
           var ov = document.getElementById("boot-overlay");
           if (ov) ov.remove();
