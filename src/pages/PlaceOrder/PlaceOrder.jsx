@@ -49,7 +49,8 @@ const PlaceOrder = () => {
 
   const [payment_method, setPaymentMethod] = useState({ value: "Transfer" });
 
-
+  const [deliveryDate, setDeliveryDate] = useState("");
+  const [note, setNote] = useState("");
   const [phone, setPhone] = useState('');
 
   
@@ -106,6 +107,13 @@ const PlaceOrder = () => {
         return;
       }
 
+    // NEW: validasi tanggal pengiriman (opsional tapi disarankan)
+    if (!deliveryDate) {
+      alert("Silakan pilih tanggal pengiriman.");
+      setIsLoading(false);
+      return;
+    }
+
     // NEW: VOUCHER — hitung subtotal & diskon dari context
     const subtotal = Number(getTotalCartAmount() || 0);
     const discount = Number(getDiscount ? getDiscount() : 0);
@@ -124,7 +132,8 @@ const PlaceOrder = () => {
         phone: user.phone,
         detail: user.address,
       },
-      // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      delivery_date: deliveryDate,
+      note,
       // NEW: VOUCHER — sertakan voucher ke payload
       voucherCode: voucher?.code || null,
       voucherDiscount: discount || 0, // opsional; server sebaiknya tetap re-validate
@@ -213,12 +222,27 @@ const PlaceOrder = () => {
           {/* Metode Pengiriman */}
           <h4 className="label">Pilih Metode Pengiriman</h4>
           <div className="form-select"> <select required placeholder="Pilih Metode Pengiriman" value={selectedShipping.value} onChange={(e) => { const selected = options.shipping.find(opt => opt.value === e.target.value); if (selected) setSelectedShipping(selected); }} > <option value="" disabled> Pilih Metode Pengiriman </option> {options.shipping.map((option) => ( <option key={option.value} value={option.value}> {option.label} - Rp{option.price ? option.price.toLocaleString("id-ID") : 0} </option> ))} </select> </div>
-        
+        {/* NEW: Tanggal Pengiriman */}
+          <h4 className="label">Tanggal Pengiriman</h4>
+          <input
+            type="date"
+            required
+            value={deliveryDate}
+            onChange={(e) => setDeliveryDate(e.target.value)}
+            min={new Date().toISOString().split("T")[0]} // supaya tidak bisa pilih tanggal sebelum hari ini
+          />
           <h4 className="label">Alamat Lengkap</h4>
         <textarea
           placeholder='Alamat Lengkap'
           value={user.address??""}
           onChange={(e) => setUser({ ...user, address: e.target.value })}
+        />
+        {/* NEW: Catatan Tambahan */}
+        <h4 className="label">Catatan Tambahan</h4>
+        <textarea
+          placeholder="Masukkan Request atau Catatan untuk Pesanan Anda"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
         />
       </div>
       <div className="place-order-right">
