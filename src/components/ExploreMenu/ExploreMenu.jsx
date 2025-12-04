@@ -32,7 +32,7 @@ const ExploreMenu = ({ category, setCategory }) => {
           >
             <div >
               <img
-                src="https://res.cloudinary.com/diotafsul/image/upload/v1761804736/Gemini_Generated_Image_d8pqdrd8pqdrd8pq_bgnjqz.png"
+                src="https://res.cloudinary.com/diotafsul/image/upload/v1764819766/kuemamida_allproduct_gsglco.png"
                 alt="All Product"
                 className={['All', 'All Product'].includes(category) ? 'active' : ''}
               />
@@ -46,7 +46,7 @@ const ExploreMenu = ({ category, setCategory }) => {
           >
             <div >
               <img
-                src="https://res.cloudinary.com/diotafsul/image/upload/v1761804736/Gemini_Generated_Image_kle7uukle7uukle7_uke11i.png"
+                src="https://res.cloudinary.com/diotafsul/image/upload/v1764819766/kuemamida_featured_ogod7v.png"
                 alt="Featured"
                 className={category === 'Featured' ? 'active' : ''}
               />
@@ -62,7 +62,7 @@ const ExploreMenu = ({ category, setCategory }) => {
           >
             <div >
               <img
-                src="https://res.cloudinary.com/diotafsul/image/upload/v1760759314/Menukuemamidaicon_combo_xhpuca.png"
+                src="https://res.cloudinary.com/diotafsul/image/upload/v1764819765/kuemamida_Combo_manw09.png"
                 alt="Featured"
                 className={category === 'Bundling' ? 'active' : ''}
               />
