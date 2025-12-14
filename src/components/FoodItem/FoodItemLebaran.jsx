@@ -34,7 +34,7 @@ const FoodItemLebaran = ({ id, name, price, varians, image, rating, inStock, cat
   return (
     <div className="food-item">
       <div className="food-item-img-container">
-        <img className="food-item-image" src={image} alt={name} onClick={() => navigate(`/detail/${slug}-${id}`)} />
+        <img className="food-item-image" src={image?image:"https://res.cloudinary.com/diotafsul/image/upload/v1765699502/Artboard_1bundlproduct_abalpr.png"} alt={name} onClick={() => navigate(`/detail/${slug}-${id}`)} />
         {!cartItems[id] ? null : (
           <div className="food-item-counter">
             <FontAwesomeIcon icon={faMinus} className="svg-minus-icon" onClick={() => removeFromCart(id)} />

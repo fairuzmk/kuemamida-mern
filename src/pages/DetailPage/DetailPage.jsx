@@ -77,7 +77,7 @@ const DetailPage = () => {
       <ToastContainer position="bottom-center" autoClose={2000} />
       {/* Gambar */}
       <div className="product-image">
-        <img src={product.image} alt={product.name} />
+        <img src={product.image?product.image:"https://res.cloudinary.com/diotafsul/image/upload/v1765699491/Artboard_1product_n6syce.png"} alt={product.name} />
       </div>
 
       {/* Detail */}

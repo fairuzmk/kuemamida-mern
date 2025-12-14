@@ -16,6 +16,7 @@ import LoginNewPopup from './components/LoginPopup/LoginNewPopUp'
 import AccountDetail from './pages/AccountDetails/AccountDetail'
 import HamperDetailPage from './pages/DetailPage/HamperDetailPage'
 import LebaranMenu from './pages/LebaranMenu/LebaranMenu'
+import InstagramCatalog from './pages/KatalogIg/InstagramCatalog'
 
 
 
@@ -39,6 +40,7 @@ const App = () => {
         <Route path='/detail/:slugAndId' element={<DetailPage/>} />
         <Route path="/hampers/:id" element={<HamperDetailPage />} />
         <Route path='/cart' element={<Cart/>} />
+        <Route path='/katalog-ig' element={<InstagramCatalog/>} />
         <Route path='/eid-mubarak' element={<LebaranMenu/>} />
         <Route path='/payment' element={<ManualPayment/>} />
         <Route path="/verify" element={<VerifyPage />} />

@@ -348,7 +348,7 @@ export default function HamperDetailPage() {
       <ToastContainer position="bottom-center" autoClose={3000} />
       <div className="hamper-image">
         {hamper.image ? (
-          <img src={hamper.image} alt={hamper.name} />
+          <img src={hamper.image?hamper.image:"https://res.cloudinary.com/diotafsul/image/upload/v1765699502/Artboard_1bundlproduct_abalpr.png"} alt={hamper.name} />
         ) : (
           <div className="no-image">No Image</div>
         )}

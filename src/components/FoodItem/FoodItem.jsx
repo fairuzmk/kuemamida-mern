@@ -34,7 +34,7 @@ const FoodItem = ({ id, name, price, varians, image, rating, inStock, category }
   return (
     <div className="food-item">
       <div className="food-item-img-container">
-        <img className="food-item-image" src={image} alt={name} onClick={() => navigate(`/detail/${slug}-${id}`)} />
+        <img className="food-item-image" src={image ? image : "https://res.cloudinary.com/diotafsul/image/upload/v1765699491/Artboard_1product_n6syce.png"} alt={name} onClick={() => navigate(`/detail/${slug}-${id}`)} />
         {!cartItems[id] ? null : (
           <div className="food-item-counter">
             <FontAwesomeIcon icon={faMinus} className="svg-minus-icon" onClick={() => removeFromCart(id)} />
