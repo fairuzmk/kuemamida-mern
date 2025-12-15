@@ -222,17 +222,20 @@
     row-gap: 20px;
   }
   .btn-ig {
-
-  font-size: 12px;
+  padding: 4px 8px;
+  font-size: 10px;
 
 }
 
   .btn-primary {
-    font-size: 12px;
+    font-size: 10px;
   }
 
 
 .viewonig {
   font-size: 14px;
+}
+.ig-caption {
+  font-size: 10px;
 }
 }
