@@ -170,7 +170,7 @@
 
   background: #b91c1c; /* merah gelap seperti gambar */
   color: #fff;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 14px;
   text-decoration: none;
 
@@ -221,4 +221,18 @@
     gap: 10px;
     row-gap: 20px;
   }
+  .btn-ig {
+
+  font-size: 12px;
+
+}
+
+  .btn-primary {
+    font-size: 12px;
+  }
+
+
+.viewonig {
+  font-size: 14px;
+}
 }
