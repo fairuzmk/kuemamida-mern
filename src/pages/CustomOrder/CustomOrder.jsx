@@ -3,10 +3,11 @@ import axios from "axios";
 import { StoreContext } from "../../context/StoreContext";
 import "./CustomOrder.css";
 
-const { url } = useContext(StoreContext);
-const API_URL = url;
+
 
 export default function CustomOrder() {
+  const { url } = useContext(StoreContext);
+  const API_URL = url;
   /* ================= STATE ================= */
   const [showAddOn, setShowAddOn] = useState(false);
   const [files, setFiles] = useState([]);
