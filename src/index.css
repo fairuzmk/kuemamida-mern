@@ -10,6 +10,12 @@
   --text-color: #333333;
   --navbar-font: "Alan Sans", sans-serif;
   --heading-font: "Acme", sans-serif;
+  --pink: #ff7aa2;
+  --pink-soft: #fff1f5;
+  --pink-dark: #e85b88;
+  --gray: #6b7280;
+  --border: #e5e7eb;
+  --bg: #fffdfd;
 }
 
 *{

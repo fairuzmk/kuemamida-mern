@@ -1,0 +1,172 @@
+/* ====== PAGE ====== */
+.custom-order {
+    max-width: 620px;
+    margin: 40px auto;
+    padding: 28px;
+    background: var(--bg);
+    border-radius: 18px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    font-family: "Inter", system-ui, sans-serif;
+  }
+  
+  .custom-order h2 {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 6px;
+  }
+  
+  /* ====== INPUTS ====== */
+  .custom-order input,
+  .custom-order textarea,
+  .custom-order select {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    font-size: 14px;
+    background: white;
+    transition: all 0.2s ease;
+  }
+  
+  .custom-order textarea {
+    resize: none;
+    min-height: 90px;
+  }
+  
+  .custom-order input:focus,
+  .custom-order textarea:focus,
+  .custom-order select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(255, 122, 162, 0.15);
+  }
+  
+  /* ====== SELECT ====== */
+  .custom-order select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 18px;
+  }
+  
+  /* ====== ADDON ====== */
+  .addon-row {
+    display: grid;
+    grid-template-columns: 1fr 120px 42px;
+    gap: 8px;
+    align-items: center;
+  }
+  
+  .addon-row button {
+    height: 42px;
+    border-radius: 10px;
+    border: none;
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  .addon-row button:hover {
+    background: #fecaca;
+  }
+  
+  .custom-order button[type="button"] {
+    background: transparent;
+    color: var(--primary-color);
+    border: 1px dashed var(--primary-color);
+    padding: 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .custom-order button[type="button"]:hover {
+    background: var(--primary-color-soft);
+  }
+  
+  /* ====== FILE UPLOAD ====== */
+  .custom-order input[type="file"] {
+    border: 2px dashed var(--border);
+    padding: 16px;
+    cursor: pointer;
+    background: var(--primary-color-soft);
+  }
+  
+  .custom-order input[type="file"]::file-selector-button {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+  
+  /* ====== PRICE BOX ====== */
+  .price {
+    background: linear-gradient(135deg, #fff1f5, #ffe4ec);
+    padding: 18px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+  }
+  
+  .price p {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 500;
+    color: #374151;
+  }
+  
+  .price p:last-child {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary-color);
+  }
+  
+  /* ====== SUBMIT ====== */
+  .custom-order button[type="submit"] {
+    margin-top: 12px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-color));
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 12px 25px rgba(255, 122, 162, 0.35);
+  }
+  
+  .custom-order button[type="submit"]:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 30px rgba(255, 122, 162, 0.45);
+  }
+  
+  .custom-order button[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  /* ====== MOBILE ====== */
+  @media (max-width: 640px) {
+    .custom-order {
+      margin: 20px;
+      padding: 20px;
+    }
+  
+    .addon-row {
+      grid-template-columns: 1fr 1fr 36px;
+    }
+  }
