@@ -1,109 +1,224 @@
+/* =========================
+   INSTAGRAM CATALOG WRAPPER
+   ========================= */
+
 .ig-catalog {
-    padding: 40px 20px;
-    max-width: 1200px;
-    margin: auto;
-  }
-  
-  .ig-title {
-    text-align: center;
-    font-size: 28px;
-    margin-bottom: 30px;
-    font-weight: 700;
-  }
-  
-  .ig-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
-  }
-  
-  .ig-card {
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-  }
-  
-  .ig-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-  }
-  
-  .ig-image-wrapper {
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .ig-image-wrapper img {
-    width: 100%;
-    height: 220px;
-    object-fit: cover;
-  }
-  
-  .ig-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    padding: 4px 10px;
-    font-size: 12px;
-    border-radius: 20px;
-    color: #fff;
-    font-weight: 600;
-  }
-  
-  .ig-badge.ready {
-    background: #16a34a;
-  }
-  
-  .ig-badge.po {
-    background: #f59e0b;
-  }
-  
-  .ig-content {
-    padding: 14px;
-  }
-  
-  .ig-content h3 {
-    font-size: 16px;
-    margin: 0 0 6px;
-  }
-  
-  .ig-price {
-    font-size: 14px;
-    color: #6b7280;
-    margin-bottom: 12px;
-  }
-  
-  .ig-actions {
+  margin-top: 30px;
+  margin-left: 8vw;
+  margin-right: 8vw;
+}
+
+.ig-title {
+  font-size: max(2vw, 24px);
+  font-weight: 700;
+  font-family: var(--heading-font);
+  color: var(--primary-color);
+  text-align: center;
+}
+
+.ig-catalog hr {
+  margin: 10px 0 20px;
+  height: 2px;
+  background-color: #e2e2e2;
+  border: none;
+}
+
+/* =========================
+   TAB MENU (REUSE EXPLORE)
+   ========================= */
+
+/* Pakai class explore-menu-list yang sudah ada */
+/* Tidak perlu redefinisi besar */
+.catalog-menu-list{
     display: flex;
-    gap: 8px;
-  }
-  
-  .btn-primary {
-    flex: 1;
-    background: #111827;
-    color: #fff;
-    padding: 8px;
+    gap:40px;
+    justify-content: center;
     text-align: center;
-    border-radius: 8px;
-    font-size: 14px;
-    text-decoration: none;
-  }
+    margin: 20px 0px;
+    cursor: pointer;
+    
+
+}
+
+.catalog-menu-list-item.active img {
+  border: 4px solid var(--primary-color);
+  padding: 2px;
+}
+
+    .catalog-menu-list-item img{
+        width: 7.5vw;
+        min-width: 70px;
+        border-radius: 50%;
+
+    
+    }
+    
+    .catalog-menu-list-item p{
+        margin-top: 10px;
+        color: var(--text-color);
+        font-size: max(1vw, 12px);
+        cursor: pointer;
+    
+    }
+
+/* =========================
+   GRID = FOOD DISPLAY STYLE
+   ========================= */
+
+.ig-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  margin-top: 30px;
+  gap: 30px;
+  row-gap: 50px;
+}
+
+/* =========================
+   CARD STYLE (MENYATU)
+   ========================= */
+
+.ig-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.ig-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+.ig-image-wrapper {
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+}
+
+.ig-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* =========================
+   CONTENT
+   ========================= */
+
+.ig-content {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ig-caption {
+  font-size: 14px;
+  color: var(--text-color);
+  line-height: 1.4;
+}
+
+/* =========================
+   ACTION BUTTONS
+   ========================= */
+
+.ig-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
   
-  .btn-outline {
-    flex: 1;
-    border: 1px solid #111827;
-    color: #111827;
-    padding: 8px;
-    text-align: center;
-    border-radius: 8px;
-    font-size: 14px;
-    text-decoration: none;
+}
+
+.btn-primary {
+  flex: 1;
+  background: #111827;
+  color: #fff;
+  padding: 8px;
+  text-align: center;
+  border-radius: 8px;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.btn-outline {
+  flex: 1;
+  background: var(--primary-color);
+  border: 1px solid #111827;
+  color: #fff;
+  padding: 8px;
+  text-align: center;
+  border-radius: 8px;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.btn-primary:hover,
+.btn-outline:hover {
+  opacity: 0.85;
+}
+
+.btn-ig {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  border-radius: 8px;
+  padding: 10px 18px;
+
+  background: #b91c1c; /* merah gelap seperti gambar */
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+
+  transition: all 0.2s ease;
+}
+
+.btn-ig:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.viewonig {
+  font-size: 18px;
+}
+
+/* =========================
+   EMPTY & LOADING
+   ========================= */
+
+.ig-loading,
+.ig-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-color);
+  font-size: 14px;
+}
+
+/* =========================
+   RESPONSIVE (SAMAKAN)
+   ========================= */
+
+@media (max-width: 600px) {
+  .ig-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    row-gap: 20px;
   }
-  
-  .btn-primary:hover,
-  .btn-outline:hover {
-    opacity: 0.85;
+}
+
+@media (max-width: 470px) {
+  .ig-catalog {
+    margin-left: 4vw;
+    margin-right: 4vw;
   }
-  
+
+  .ig-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    row-gap: 20px;
+  }
+}
