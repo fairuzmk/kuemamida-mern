@@ -24,7 +24,7 @@ const Header = ({ slides = [] }) => {
     {
       id: 2,
       imageUrl:
-        'https://images.unsplash.com/photo-1541971271026-2f16f0339d89?q=80&w=1933&auto=format&fit=crop',
+        'https://res.cloudinary.com/diotafsul/image/upload/v1766226490/Cover_Birthday_jj8bji.png',
       title: 'Kue Custom untuk Momen Spesial',
       description:
         'Rayakan ulang tahun, anniversary, atau acara keluarga dengan kue custom yang bisa kamu desain sendiri.',

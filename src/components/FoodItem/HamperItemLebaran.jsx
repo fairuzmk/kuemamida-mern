@@ -22,7 +22,7 @@ const HamperItemLebaran = ({ hamper }) => {
   return (
     <div className="food-item">
       <div className="food-item-img-container" onClick={() => navigate(`/hampers/${_id}`)}>
-        <img className="food-item-image" src={image} alt={name} />
+        <img className="food-item-image" src={image?image:"https://res.cloudinary.com/diotafsul/image/upload/v1765699502/Artboard_1bundlproduct_abalpr.png"} alt={name} />
       </div>
       <div className="food-item-info">
         <div className="food-item-name-rating">
