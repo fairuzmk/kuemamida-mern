@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import Navbar from './components/Navbar/Navbar'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import Home from './pages/Home/Home'
@@ -17,13 +17,14 @@ import AccountDetail from './pages/AccountDetails/AccountDetail'
 import HamperDetailPage from './pages/DetailPage/HamperDetailPage'
 import LebaranMenu from './pages/LebaranMenu/LebaranMenu'
 import InstagramCatalog from './pages/KatalogIg/InstagramCatalog'
+import { StoreContext } from './context/StoreContext'
 
 
 
 
 const App = () => {
 
-  const[showLogin,setShowLogin] = useState(false)
+  const { showLogin, setShowLogin } = useContext(StoreContext);
 
 
 

@@ -8,6 +8,7 @@ export const StoreContext = createContext(null)
 
 const StoreContextProvider = (props) => {
 
+    const [showLogin, setShowLogin] = useState(false);
     const [cartItems, setCartItems] = useState(() => {
        try { return JSON.parse(localStorage.getItem("cartItems")) || {}; } catch { return {}; }
      });
@@ -615,6 +616,8 @@ const addToCart = async (itemKey, qty = 1) => {
         clearVoucher,
         getDiscount,
         getGrandTotal,
+        showLogin,
+    setShowLogin,
     }
 
 

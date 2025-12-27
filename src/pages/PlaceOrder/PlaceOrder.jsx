@@ -28,17 +28,28 @@ const PlaceOrder = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
+      if (!token) return;
+  
       try {
         const res = await axios.get(`${url}/api/user-new/account`, {
           headers: { token }
         });
-        if (res.data.success) {
+  
+        if (res.data.success && res.data.user?.name) {
           setUser(res.data.user);
+        } else {
+          throw new Error("INVALID_USER");
         }
       } catch (err) {
-        console.error(err);
-      } finally {
-        
+        console.warn("User not authenticated, clearing token");
+  
+        // 🔥 TOKEN TIDAK VALID → ANGKAT STATUS LOGIN
+        localStorage.removeItem("token");
+        localStorage.removeItem("cartItems");
+        setUser({ name: "", address: "", phone: "" });
+  
+        alert("Silahkan login terlebih dahulu");
+        setShowLogin(true);
       }
     };
     fetchUser();
@@ -60,7 +71,11 @@ const PlaceOrder = () => {
     setIsLoading(true); // mulai loading
   
     const token = localStorage.getItem("token");
-  
+    if (!token || !user?.name) {
+      alert("Silahkan login terlebih dahulu");
+      setShowLogin(true);
+      return;
+    }
     // Langkah 1: Bersihkan cart dari item yang tidak valid
     const cleanedCartItems = Object.fromEntries(
       Object.entries(cartItems).filter(([key]) => {

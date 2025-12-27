@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { StoreContext } from '../context/StoreContext';
 
 const ProtectedRoute = ({ children }) => {
-  const { cartItems, cartBundles } = useContext(StoreContext);
+  const { cartItems, cartBundles,token,setShowLogin } = useContext(StoreContext);
 
   // Snapshot bundling: pakai context dulu; kalau kosong, fallback localStorage
   const bundlesSnap = Array.isArray(cartBundles) && cartBundles.length
@@ -22,6 +22,16 @@ const ProtectedRoute = ({ children }) => {
 
   if (!(hasSingle || hasBundle)) {
     return <Navigate to="/cart" replace />;
+  }
+
+  useEffect(() => {
+    if (!token) {
+      setShowLogin(true);
+    }
+  }, [token, setShowLogin]);
+
+  if (!token) {
+    return null; // ⛔ tahan halaman, popup login yang tampil
   }
 
   return children;
