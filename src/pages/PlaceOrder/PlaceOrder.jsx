@@ -21,7 +21,8 @@ const PlaceOrder = () => {
 
   
    const [user, setUser] = useState({ name: "", address: "", phone:"" });
-
+   const [deliveryDate, setDeliveryDate] = useState("");
+   const [allowedDates, setAllowedDates] = useState([]);
   useEffect(() => {
     fetchOptions();
   }, []);
@@ -55,12 +56,41 @@ const PlaceOrder = () => {
     fetchUser();
   }, [token]);
 
+  
+  useEffect(() => {
+    const fetchDeliveryDates = async () => {
+      try {
+        const res = await axios.get(`${url}/api/range-date/delivery-dates`);
+        if (res.data.success && Array.isArray(res.data.data)) {
+          setAllowedDates(res.data.data);
+        } else {
+          setAllowedDates([]); // fallback ke array kosong
+        }
+      } catch (err) {
+        console.error("Failed to fetch delivery dates", err);
+        setAllowedDates([]); // fallback ke array kosong
+      }
+    };
+    fetchDeliveryDates();
+  }, [url]);
+
   const [isLoading, setIsLoading] = useState(false);
   const [selectedShipping, setSelectedShipping] = useState( {value: "", label: "", price: 0});
 
   const [payment_method, setPaymentMethod] = useState({ value: "Transfer" });
 
-  const [deliveryDate, setDeliveryDate] = useState("");
+  
+  const formatDate = (dateStr) => {
+    const d = new Date(dateStr);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+  
+  const minDate = allowedDates.length > 0 ? formatDate(allowedDates[0]) : "";
+  const maxDate = allowedDates.length > 0 ? formatDate(allowedDates[allowedDates.length - 1]) : "";
+  
   const [note, setNote] = useState("");
   const [phone, setPhone] = useState('');
 
@@ -69,11 +99,15 @@ const PlaceOrder = () => {
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     setIsLoading(true); // mulai loading
-  
+    
     const token = localStorage.getItem("token");
     if (!token || !user?.name) {
       alert("Silahkan login terlebih dahulu");
       setShowLogin(true);
+      return;
+    }
+    if (!allowedDates.includes(deliveryDate)) {
+      alert("Tanggal pengiriman tidak valid!");
       return;
     }
     // Langkah 1: Bersihkan cart dari item yang tidak valid
@@ -241,10 +275,11 @@ const PlaceOrder = () => {
           <h4 className="label">Tanggal Pengiriman</h4>
           <input
             type="date"
-            required
             value={deliveryDate}
             onChange={(e) => setDeliveryDate(e.target.value)}
-            min={new Date().toISOString().split("T")[0]} // supaya tidak bisa pilih tanggal sebelum hari ini
+            min={minDate}
+            max={maxDate}
+            required
           />
           <h4 className="label">Alamat Lengkap</h4>
         <textarea
