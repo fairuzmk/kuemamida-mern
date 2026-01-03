@@ -8,10 +8,11 @@ import axios from 'axios';
 import { Turnstile } from "@marsidev/react-turnstile";
 import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from 'react-router-dom';
 
 const LoginNewPopup = ({ setShowLogin }) => {
   const { url, setToken } = useContext(StoreContext);
-
+  const navigate = useNavigate();
 
   const [currState, setCurrState] = useState("Login"); // Login | Sign Up
   const [loginMethod, setLoginMethod] = useState("phone"); // email | phone
@@ -123,6 +124,7 @@ const handlePhoneChange = (e) => {
       setToken(response.data.token);
       localStorage.setItem("token", response.data.token);
       setShowLogin(false);
+      navigate("/my-account");
     } else {
       alert(response.data.message);
     }
@@ -200,7 +202,8 @@ const handlePhoneChange = (e) => {
             {!otpSent ? (
             <div className='input-nomor-wa'>
             <div className='login-icon'><FaWhatsapp /></div>
-            <label>Nomor Whatsapp</label>
+            <label>Login dengan Whatsapp</label>
+            <p>Silahkan Masukkan Nomor Whatsapp Kamu untuk Login</p>
             <input
               type="text"
               name="phone"
@@ -209,6 +212,8 @@ const handlePhoneChange = (e) => {
               placeholder="Ex. 081123212321"
               required
                 />
+              
+              
               <div className='captcha-box'>
                <Turnstile
                   siteKey="0x4AAAAAABqlW_kzRn-ubIz3"

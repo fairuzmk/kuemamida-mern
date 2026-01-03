@@ -8,6 +8,8 @@ export const StoreContext = createContext(null)
 
 const StoreContextProvider = (props) => {
 
+    const [user, setUser] = useState(null);
+    const [userLoading, setUserLoading] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [cartItems, setCartItems] = useState(() => {
        try { return JSON.parse(localStorage.getItem("cartItems")) || {}; } catch { return {}; }
@@ -28,6 +30,7 @@ const StoreContextProvider = (props) => {
     const [food_list, setFoodList] = useState([])
     const [hampers, setHampers] = useState([]);
     const [hampersPagination, setHampersPagination] = useState(null);
+    
     
 
      // ===== Realtime stock helpers (single  bundling) =====
@@ -380,7 +383,31 @@ const addToCart = async (itemKey, qty = 1) => {
         }
       }, [cartBundles, token]);
 
-
+      useEffect(() => {
+        if (!token) {
+          setUser(null);
+          return;
+        }
+      
+        const fetchUser = async () => {
+          setUserLoading(true);
+          try {
+            const res = await axios.get(`${url}/api/user-new/account`, {
+              headers: { token },
+            });
+            if (res.data?.success) {
+              setUser(res.data.user);
+            }
+          } catch (err) {
+            console.error(err);
+          } finally {
+            setUserLoading(false);
+          }
+        };
+      
+        fetchUser();
+      }, [token, url]);
+      
 
       const quantityItem = () => {
         // jumlah item produk biasa (cartItems)
@@ -618,6 +645,9 @@ const addToCart = async (itemKey, qty = 1) => {
         getGrandTotal,
         showLogin,
     setShowLogin,
+    user,
+    userLoading, 
+    setUser
     }
 
 

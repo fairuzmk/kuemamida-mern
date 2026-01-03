@@ -17,10 +17,10 @@ const PlaceOrder = () => {
   const navigate = useNavigate();
 
   const {getTotalCartAmount, quantityItem, cartItems, food_list, url, options, fetchOptions, setCartItems, token, cartBundles, voucher,
-    getDiscount, setCartBundles, loadCartData} = useContext(StoreContext);
+    getDiscount, user, setUser, setCartBundles, loadCartData} = useContext(StoreContext);
 
   
-   const [user, setUser] = useState({ name: "", address: "", phone:"" });
+   
    const [deliveryDate, setDeliveryDate] = useState("");
    const [allowedDates, setAllowedDates] = useState([]);
   useEffect(() => {

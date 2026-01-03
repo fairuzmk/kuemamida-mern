@@ -56,4 +56,11 @@
     margin-bottom: 10px;
     color: #007bff;
   }
+  .text-account {
+    text-align: left;
+    margin-bottom: 10px;
+    color: #555;
+    font-style: italic;
+    font-size: 14px;
+  }
   

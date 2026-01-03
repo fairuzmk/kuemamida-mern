@@ -3,13 +3,16 @@ import axios from "axios";
 import "./AccountDetail.css";
 import { StoreContext } from "../../context/StoreContext";
 import { toast, ToastContainer } from "react-toastify";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function AccountDetail() {
-  const [user, setUser] = useState({ name: "", address: "", phone: "" });
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from || "/order";
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
-  const { url, token } = useContext(StoreContext);
+  const { url, user, setUser, token } = useContext(StoreContext);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -40,6 +43,15 @@ export default function AccountDetail() {
     setUser((prev) => ({ ...prev, [name]: value ?? "" }));
   };
 
+  const refreshUser = async () => {
+    const res = await axios.get(`${url}/api/user-new/account`, {
+      headers: { token },
+    });
+    if (res.data?.success) {
+      setUser(res.data.user);
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true);
     setMessage("");
@@ -52,8 +64,15 @@ export default function AccountDetail() {
       const res = await axios.post(`${url}/api/user-new/account/update`, payload, {
         headers: { token },
       });
+
       if (res.data?.success) {
+        setUser((prev) => ({
+          ...prev,
+          ...payload,
+        }));
         setMessage("Data berhasil diperbarui!");
+        await refreshUser();
+        navigate(from, { replace: true });
         toast.success("Data berhasil diperbarui");
       } else {
         setMessage(res.data?.message || "Gagal memperbarui data.");
@@ -72,7 +91,7 @@ export default function AccountDetail() {
     <>
       <div className="account-detail-container">
         <h1>Account Detail</h1>
-
+        <p className="text-account">Silahkan lengkapi terlebih dahulu data dibawah ini sebelum checkout</p>
         {message && <p className="message">{message}</p>}
 
         <label>
