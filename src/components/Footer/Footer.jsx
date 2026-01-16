@@ -52,7 +52,7 @@ const Footer = () => {
                     
                     className="svg-contact-icon"
                     />
-              <span>+6281 878787878</span>
+              <span>+6287 8886-24508</span>
             </div>
             <div className="contact-item">
             <FontAwesomeIcon
