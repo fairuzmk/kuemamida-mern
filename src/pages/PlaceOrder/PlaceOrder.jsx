@@ -17,7 +17,7 @@ const PlaceOrder = () => {
   const navigate = useNavigate();
 
   const {getTotalCartAmount, quantityItem, cartItems, food_list, url, options, fetchOptions, setCartItems, token, cartBundles, voucher,
-    getDiscount, user, setUser, setCartBundles, loadCartData} = useContext(StoreContext);
+    getDiscount, user, setUser, setCartBundles, loadCartData, setShowLogin} = useContext(StoreContext);
 
   
    
@@ -27,34 +27,42 @@ const PlaceOrder = () => {
     fetchOptions();
   }, []);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      if (!token) return;
-  
-      try {
-        const res = await axios.get(`${url}/api/user-new/account`, {
-          headers: { token }
-        });
-  
-        if (res.data.success && res.data.user?.name) {
-          setUser(res.data.user);
-        } else {
-          throw new Error("INVALID_USER");
-        }
-      } catch (err) {
-        console.warn("User not authenticated, clearing token");
-  
-        // 🔥 TOKEN TIDAK VALID → ANGKAT STATUS LOGIN
-        localStorage.removeItem("token");
-        localStorage.removeItem("cartItems");
-        setUser({ name: "", address: "", phone: "" });
-  
-        alert("Silahkan login terlebih dahulu");
-        setShowLogin(true);
-      }
-    };
-    fetchUser();
-  }, [token]);
+
+      useEffect(() => {
+        const fetchUser = async () => {
+          // Jika tidak ada token, jangan lakukan apa-apa
+          if (!token) return;
+
+          try {
+            const res = await axios.get(`${url}/api/user-new/account`, {
+              headers: { token }
+            });
+
+            if (res.data.success && res.data.user) {
+              setUser(res.data.user);
+            }
+          } catch (err) {
+            console.error("Auth failed:", err.response?.status);
+
+            // 🔥 RESET SEMUA STATE
+            localStorage.removeItem("token");
+            if (setToken) setToken(""); // Hapus token di state global agar useEffect berhenti
+            setUser(null); // Set null agar komponen tahu user tidak ada
+
+            alert("Sesi Anda telah berakhir, silakan login kembali.");
+            
+            // 🔥 PROTEKSI: Cek apakah fungsi ada sebelum dipanggil
+            if (setShowLogin) {
+              setShowLogin(true);
+            }
+            
+            // Pindah ke home agar tidak terjebak di halaman yang butuh data user
+            navigate('/');
+          }
+        };
+
+        fetchUser();
+      }, [token]); // Token sebagai dependency sudah benar
 
   
   useEffect(() => {

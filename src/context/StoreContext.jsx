@@ -26,7 +26,22 @@ const StoreContextProvider = (props) => {
     const [token, setToken] = useState(() => {
         return localStorage.getItem("token") || "";
     });
-
+    useEffect(() => {
+      const interceptor = axios.interceptors.response.use(
+          (response) => response, 
+          (error) => {
+              if (error.response && error.response.status === 401) {
+                  setToken("");
+                  setUser(null);
+                  localStorage.removeItem("token");
+                  toast.error("Sesi berakhir, silakan login kembali");
+                  setShowLogin(true); // Memunculkan popup login otomatis
+              }
+              return Promise.reject(error);
+          }
+      );
+      return () => axios.interceptors.response.eject(interceptor);
+      }, []);
     const [food_list, setFoodList] = useState([])
     const [hampers, setHampers] = useState([]);
     const [hampersPagination, setHampersPagination] = useState(null);

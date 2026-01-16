@@ -99,7 +99,7 @@ export default function AccountDetail() {
           <input
             type="text"
             name="name"
-            value={user.name ?? ""}        // fallback string kosong
+            value={user?.name ?? ""}        // fallback string kosong
             onChange={handleChange}
           />
         </label>
