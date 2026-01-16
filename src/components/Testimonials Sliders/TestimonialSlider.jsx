@@ -86,7 +86,7 @@ const TestimonialSwiper = () => {
                 <span className="quote">“</span>
                 <div className="user">
                 <img
-                    src={`https://avatar.iran.liara.run/public/${item.gender === "male" ? "boy" : "girl"}?username=${item.avatarSeed}`}
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=random&color=fff&size=128`}
                     alt={item.name}
                   />
                   <div className="user-info">
