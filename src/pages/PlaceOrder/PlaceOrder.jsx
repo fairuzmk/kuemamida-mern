@@ -239,7 +239,7 @@ const PlaceOrder = () => {
             required
             type="text"
             placeholder='Nama Penerima'
-            value={user.name??""}
+            value={user?.name??""}
             onChange={(e) => setUser(prev => ({ ...prev, name: e.target.value }))}
           />
         </div>
@@ -247,7 +247,7 @@ const PlaceOrder = () => {
         <input
             type="text"
             placeholder='Nomor HP (Whatsapp)'
-            value={user.phone??""}
+            value={user?.phone??""}
             onChange={(e) => setUser(prev => ({ ...prev, phone: e.target.value }))}
           />
 
@@ -292,7 +292,7 @@ const PlaceOrder = () => {
           <h4 className="label">Alamat Lengkap</h4>
         <textarea
           placeholder='Alamat Lengkap'
-          value={user.address??""}
+          value={user?.address??""}
           onChange={(e) => setUser({ ...user, address: e.target.value })}
         />
         {/* NEW: Catatan Tambahan */}

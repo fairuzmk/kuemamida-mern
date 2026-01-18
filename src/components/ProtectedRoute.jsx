@@ -10,7 +10,7 @@ const ProtectedRoute = ({ children }) => {
   const { cartItems, cartBundles,token,setShowLogin, user, userLoading } = useContext(StoreContext);
   const location = useLocation();
   const isNameIncomplete = (name) =>
-    !name || name.trim() === "" || name === "Pengguna WA";
+    name === "Pengguna WA";
   const bundlesSnap = Array.isArray(cartBundles) && cartBundles.length
     ? cartBundles
     : (() => {
