@@ -74,7 +74,7 @@ const Footer = () => {
         </div>
       </div>
       <hr />
-      <p className="footer-copyright">Copyright &copy; 2025 Kue Mamida | <a href='fzmilky.my.id'>Design by FairuzMK&trade;</a></p>
+      <p className="footer-copyright">Copyright &copy; 2025 Kue Mamida | <a href='https://fzmilky.my.id'>Design by FairuzMK&trade;</a></p>
     </div>
   )
 }
