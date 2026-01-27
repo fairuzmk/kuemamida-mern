@@ -21,6 +21,7 @@ const PlaceOrder = () => {
 
   
    const [user, setUser] = useState({ name: "", address: "", phone:"" });
+ const [isShippingVisible, setIsShippingVisible] = useState(false);
 
   useEffect(() => {
     fetchOptions();
@@ -45,7 +46,7 @@ const PlaceOrder = () => {
   }, [token]);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedShipping, setSelectedShipping] = useState( {value: "", label: "", price: 0});
+  const [selectedShipping, setSelectedShipping] = useState( {value: "Diambil Sendiri"});
 
   const [payment_method, setPaymentMethod] = useState({ value: "Transfer" });
 
@@ -165,8 +166,8 @@ const PlaceOrder = () => {
 
 
   const paymentMethod = [
-    { value: "Transfer", label: "Transfer Bank", icon: <FaMoneyCheck /> },
-    { value: "COD", label: "Bayar di tempat", icon: <FaMoneyBill /> }
+    { value: "Transfer", label: "Transfer Bank", icon: <FaMoneyCheck />, disabled: false },
+    { value: "COD", label: "Bayar di tempat", icon: <FaMoneyBill />, disabled: true }
   ];
 
   
@@ -203,14 +204,15 @@ const PlaceOrder = () => {
                   key={method.value}
                   className={`radio-card ${
                     payment_method.value === method.value ? "active" : ""
-                  }`}
+                  } ${method.disabled ? "disabled" : ""}`} // Tambahkan class disabled jika true
                 >
                   <input
                     type="radio"
                     name="payment"
                     value={method.value}
                     checked={payment_method.value === method.value}
-                    onChange={() => setPaymentMethod({ value: method.value })}
+                    disabled={method.disabled} // TAMBAHKAN INI
+                    onChange={() => !method.disabled && setPaymentMethod({ value: method.value })} // Cegah klik jika disabled
                   />
                   <div className="icon">{method.icon}</div>
                   <span className="method-label">{method.label}</span>
@@ -220,8 +222,10 @@ const PlaceOrder = () => {
           </div>
 
           {/* Metode Pengiriman */}
+          <div style={{ display: isShippingVisible ? 'block' : 'none' }}>
           <h4 className="label">Pilih Metode Pengiriman</h4>
           <div className="form-select"> <select required placeholder="Pilih Metode Pengiriman" value={selectedShipping.value} onChange={(e) => { const selected = options.shipping.find(opt => opt.value === e.target.value); if (selected) setSelectedShipping(selected); }} > <option value="" disabled> Pilih Metode Pengiriman </option> {options.shipping.map((option) => ( <option key={option.value} value={option.value}> {option.label} - Rp{option.price ? option.price.toLocaleString("id-ID") : 0} </option> ))} </select> </div>
+          </div>
         {/* NEW: Tanggal Pengiriman */}
           <h4 className="label">Tanggal Pengiriman</h4>
           <input
@@ -272,7 +276,7 @@ const PlaceOrder = () => {
           </div>
 
           <div className="cart-total-details">
-            <span style={{ color: "#666", fontSize: 12 }}>{selectedShipping.value}</span>
+            {/* <span style={{ color: "#666", fontSize: 12 }}>{selectedShipping.label}</span> */}
           </div>
 
           <hr />
