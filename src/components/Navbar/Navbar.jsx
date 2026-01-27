@@ -22,9 +22,9 @@ const Navbar = ({setShowLogin}) => {
 
     const [showSidebar, setShowSidebar] = useState(false);
 
-    const {getTotalCartAmount, token, setToken, url, setCartItems, setCartBundles} = useContext(StoreContext);
+    const {getTotalCartAmount, token, setToken, url, setCartItems, setCartBundles, user, setUser} = useContext(StoreContext);
 
-    const [user, setUser] = useState({ name: "", address: "" });
+    
 
     const navigate = useNavigate();
 
@@ -121,7 +121,7 @@ const Navbar = ({setShowLogin}) => {
             :
             <>
             <li onClick={() => { setShowSidebar(false); }}>
-            <FontAwesomeIcon icon={faUser} className="svg-sidebar-icon" />Hai, {user.name}</li>
+            <FontAwesomeIcon icon={faUser} className="svg-sidebar-icon" />Hai, {user?.name ?? ""}</li>
             <li onClick={() => { logout(); setShowLogin(false); setShowSidebar(false); }}>
             <FontAwesomeIcon icon={faRightFromBracket} className="svg-sidebar-icon" />Sign Out</li>
             </>
@@ -165,7 +165,7 @@ const Navbar = ({setShowLogin}) => {
               className="svg-navbar-icon"/>
           <div className='account-dropdown'>
           <p>My Profile</p>
-          <span>({user.name})</span>
+          <span>({user?.name})</span>
           </div>
           
           </li>

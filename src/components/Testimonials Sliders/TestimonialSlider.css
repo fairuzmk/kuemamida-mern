@@ -1,0 +1,164 @@
+.testimonial-section {
+  padding: 80px 20px;
+  background: linear-gradient(180deg, #f9fafb 0%, #ede8d0 100%);
+  margin: 48px auto 0px;
+}
+
+.testimonial-header {
+  max-width: 600px;
+  margin: 0 auto 48px;
+  text-align: center;
+}
+
+.testimonial-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 12px 0;
+  color: #111827;
+}
+
+.testimonial-header p {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: var(--primary-color);
+}
+
+.testimonial-swiper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+
+/* Card */
+.testimonial-card {
+  position: relative;
+  height: 100%;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 28px 24px 24px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* Quote mark */
+.quote {
+  position: absolute;
+  top: 18px;
+  right: 24px;
+  font-size: 64px;
+  line-height: 1;
+  color: #eef2ff;
+  font-family: serif;
+  pointer-events: none;
+}
+
+.message-testimonial {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #374151;
+}
+
+.read-more {
+  margin-left: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary-color);
+  cursor: pointer;
+}
+
+.read-more:hover {
+  text-decoration: underline;
+}
+
+
+/* User */
+.user {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: auto;
+}
+
+.user img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.role {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Swiper */
+.swiper-button-next,
+.swiper-button-prev {
+  color: var(--primary-color);
+  width: 28px;
+  height: 28px;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 12px;
+}
+
+.swiper-pagination-bullet {
+  background: #fff;
+  opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+  background: var(--primary-color);
+}
+
+
+@media(max-width: 500px){
+
+  .swiper-button-next,
+  .swiper-button-prev {
+  width: 12px;
+  height: 12px;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 8px;
+}
+
+
+.swiper-pagination-bullet {
+  display: none;
+}
+}

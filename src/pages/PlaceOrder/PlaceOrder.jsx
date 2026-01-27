@@ -17,40 +17,94 @@ const PlaceOrder = () => {
   const navigate = useNavigate();
 
   const {getTotalCartAmount, quantityItem, cartItems, food_list, url, options, fetchOptions, setCartItems, token, cartBundles, voucher,
-    getDiscount, setCartBundles, loadCartData} = useContext(StoreContext);
+    getDiscount, user, setUser, setCartBundles, loadCartData, setShowLogin} = useContext(StoreContext);
 
   
+<<<<<<< HEAD
    const [user, setUser] = useState({ name: "", address: "", phone:"" });
  const [isShippingVisible, setIsShippingVisible] = useState(false);
 
+=======
+   
+   const [deliveryDate, setDeliveryDate] = useState("");
+   const [allowedDates, setAllowedDates] = useState([]);
+>>>>>>> d39c874f36252e15726ce1ae0540005961116bea
   useEffect(() => {
     fetchOptions();
   }, []);
 
+
+      useEffect(() => {
+        const fetchUser = async () => {
+          // Jika tidak ada token, jangan lakukan apa-apa
+          if (!token) return;
+
+          try {
+            const res = await axios.get(`${url}/api/user-new/account`, {
+              headers: { token }
+            });
+
+            if (res.data.success && res.data.user) {
+              setUser(res.data.user);
+            }
+          } catch (err) {
+            console.error("Auth failed:", err.response?.status);
+
+            // 🔥 RESET SEMUA STATE
+            localStorage.removeItem("token");
+            if (setToken) setToken(""); // Hapus token di state global agar useEffect berhenti
+            setUser(null); // Set null agar komponen tahu user tidak ada
+
+            alert("Sesi Anda telah berakhir, silakan login kembali.");
+            
+            // 🔥 PROTEKSI: Cek apakah fungsi ada sebelum dipanggil
+            if (setShowLogin) {
+              setShowLogin(true);
+            }
+            
+            // Pindah ke home agar tidak terjebak di halaman yang butuh data user
+            navigate('/');
+          }
+        };
+
+        fetchUser();
+      }, [token]); // Token sebagai dependency sudah benar
+
+  
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchDeliveryDates = async () => {
       try {
-        const res = await axios.get(`${url}/api/user-new/account`, {
-          headers: { token }
-        });
-        if (res.data.success) {
-          setUser(res.data.user);
+        const res = await axios.get(`${url}/api/range-date/delivery-dates`);
+        if (res.data.success && Array.isArray(res.data.data)) {
+          setAllowedDates(res.data.data);
+        } else {
+          setAllowedDates([]); // fallback ke array kosong
         }
       } catch (err) {
-        console.error(err);
-      } finally {
-        
+        console.error("Failed to fetch delivery dates", err);
+        setAllowedDates([]); // fallback ke array kosong
       }
     };
-    fetchUser();
-  }, [token]);
+    fetchDeliveryDates();
+  }, [url]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [selectedShipping, setSelectedShipping] = useState( {value: "Diambil Sendiri"});
 
   const [payment_method, setPaymentMethod] = useState({ value: "Transfer" });
 
-  const [deliveryDate, setDeliveryDate] = useState("");
+  
+  const formatDate = (dateStr) => {
+    const d = new Date(dateStr);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+  
+  const minDate = allowedDates.length > 0 ? formatDate(allowedDates[0]) : "";
+  const maxDate = allowedDates.length > 0 ? formatDate(allowedDates[allowedDates.length - 1]) : "";
+  
   const [note, setNote] = useState("");
   const [phone, setPhone] = useState('');
 
@@ -59,9 +113,17 @@ const PlaceOrder = () => {
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     setIsLoading(true); // mulai loading
-  
+    
     const token = localStorage.getItem("token");
-  
+    if (!token || !user?.name) {
+      alert("Silahkan login terlebih dahulu");
+      setShowLogin(true);
+      return;
+    }
+    if (!allowedDates.includes(deliveryDate)) {
+      alert("Tanggal pengiriman tidak valid!");
+      return;
+    }
     // Langkah 1: Bersihkan cart dari item yang tidak valid
     const cleanedCartItems = Object.fromEntries(
       Object.entries(cartItems).filter(([key]) => {
@@ -183,7 +245,7 @@ const PlaceOrder = () => {
             required
             type="text"
             placeholder='Nama Penerima'
-            value={user.name??""}
+            value={user?.name??""}
             onChange={(e) => setUser(prev => ({ ...prev, name: e.target.value }))}
           />
         </div>
@@ -191,7 +253,7 @@ const PlaceOrder = () => {
         <input
             type="text"
             placeholder='Nomor HP (Whatsapp)'
-            value={user.phone??""}
+            value={user?.phone??""}
             onChange={(e) => setUser(prev => ({ ...prev, phone: e.target.value }))}
           />
 
@@ -230,15 +292,16 @@ const PlaceOrder = () => {
           <h4 className="label">Tanggal Pengiriman</h4>
           <input
             type="date"
-            required
             value={deliveryDate}
             onChange={(e) => setDeliveryDate(e.target.value)}
-            min={new Date().toISOString().split("T")[0]} // supaya tidak bisa pilih tanggal sebelum hari ini
+            min={minDate}
+            max={maxDate}
+            required
           />
           <h4 className="label">Alamat Lengkap</h4>
         <textarea
           placeholder='Alamat Lengkap'
-          value={user.address??""}
+          value={user?.address??""}
           onChange={(e) => setUser({ ...user, address: e.target.value })}
         />
         {/* NEW: Catatan Tambahan */}

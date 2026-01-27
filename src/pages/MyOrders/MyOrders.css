@@ -180,11 +180,36 @@
   opacity: 0.9;
 }
 
+.show-more {
+  font-size: 13px;
+  color: var(--primary-color);
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 5px;
+  text-decoration: underline;
+}
+
+.show-more:hover {
+  opacity: 0.8;
+}
+
+.show-more {
+  font-weight: 400;
+  color: #fc0303;
+  font-style: italic;
+  text-decoration: none;
+  display: inline-block;
+  margin-left: 5px;
+}
+
+.status-container {
+    margin-top: 10px;
+}
 
 @media (max-width: 500px) {
 
   .order-left img{
-    display: none;
+    
     height: 40px;
     width: auto;
 
@@ -234,5 +259,8 @@
   .order-total {
     font-size: 12px;
   
+  }
+  .show-more p {
+    font-size: 10px
   }
 }

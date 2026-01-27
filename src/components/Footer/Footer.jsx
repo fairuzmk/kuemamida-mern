@@ -52,7 +52,7 @@ const Footer = () => {
                     
                     className="svg-contact-icon"
                     />
-              <span>+6281 878787878</span>
+              <span>+6287 8886-24508</span>
             </div>
             <div className="contact-item">
             <FontAwesomeIcon
@@ -74,7 +74,7 @@ const Footer = () => {
         </div>
       </div>
       <hr />
-      <p className="footer-copyright">Copyright &copy; 2025 Kue Mamida | <a href=''>Design by FairuzMK&trade;</a></p>
+      <p className="footer-copyright">Copyright &copy; 2025 Kue Mamida | <a href='https://fzmilky.my.id'>Design by FairuzMK&trade;</a></p>
     </div>
   )
 }
