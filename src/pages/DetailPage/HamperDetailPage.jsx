@@ -75,7 +75,9 @@ export default function HamperDetailPage() {
       candidates = candidates.filter((f) => setCats.has(getCategoryId(f)));
     }
 
-    return candidates;
+    return candidates.sort((a, b) => 
+      (a.name || "").localeCompare(b.name || "", 'id', { sensitivity: 'base' })
+    );
   });
 }, [hamper, food_list]);
 
