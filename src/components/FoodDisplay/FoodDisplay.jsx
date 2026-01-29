@@ -8,7 +8,7 @@ import HamperItemLebaran from '../FoodItem/HamperItemLebaran';
 const FoodDisplay = ({ category }) => {
   const { food_list, url } = useContext(StoreContext);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // Bisa kamu ubah sesuai desain
+  const itemsPerPage = 12; // Bisa kamu ubah sesuai desain
   const [hampers, setHampers] = useState([]);
   const [loadingHampers, setLoadingHampers] = useState(true);
 
