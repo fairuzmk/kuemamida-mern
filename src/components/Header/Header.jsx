@@ -14,7 +14,7 @@ const Header = ({ slides = [] }) => {
     {
       id: 1,
       imageUrl:
-        'https://images.unsplash.com/photo-1574344069030-b2926f1b3d06?q=80&w=1933&auto=format&fit=crop',
+        'https://res.cloudinary.com/diotafsul/image/upload/v1769729965/WhatsApp_Image_2026-01-29_at_21.03.51_cd6rtl.jpg',
       title: 'Order your favourite cake here',
       description:
         'Di balik setiap kue yang kami sajikan, ada proses yang penuh cinta dan perhatian. Kami percaya bahwa kue yang baik bukan hanya soal rasa—tetapi juga soal pengalaman dan kehangatan yang menyertainya.',
@@ -34,7 +34,7 @@ const Header = ({ slides = [] }) => {
     {
       id: 3,
       imageUrl:
-        'https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?q=80&w=1933&auto=format&fit=crop',
+        'https://res.cloudinary.com/diotafsul/image/upload/v1769729965/WhatsApp_Image_2026-01-29_at_21.02.04_h1rl8n.jpg',
       title: 'Fresh from the Oven',
       description:
         'Semua kue dibuat fresh setiap hari dengan bahan berkualitas, tanpa stok lama di chiller.',
