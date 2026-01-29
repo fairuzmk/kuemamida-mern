@@ -8,27 +8,19 @@ import { useNavigate } from 'react-router-dom';
 import { FaMoneyBill, FaMoneyCheck, FaTruck } from 'react-icons/fa';
 
 
-
-
-
-
-
 const PlaceOrder = () => {
   const navigate = useNavigate();
 
   const {getTotalCartAmount, quantityItem, cartItems, food_list, url, options, fetchOptions, setCartItems, token, cartBundles, voucher,
-    getDiscount, user, setUser, setCartBundles, loadCartData, setShowLogin} = useContext(StoreContext);
+  getDiscount, user, setUser, setCartBundles, loadCartData, setShowLogin} = useContext(StoreContext);
 
   
-<<<<<<< HEAD
-   const [user, setUser] = useState({ name: "", address: "", phone:"" });
- const [isShippingVisible, setIsShippingVisible] = useState(false);
+   
+    const [isShippingVisible, setIsShippingVisible] = useState(false);
 
-=======
    
    const [deliveryDate, setDeliveryDate] = useState("");
    const [allowedDates, setAllowedDates] = useState([]);
->>>>>>> d39c874f36252e15726ce1ae0540005961116bea
   useEffect(() => {
     fetchOptions();
   }, []);
