@@ -9,7 +9,7 @@ const LogoMarquee = () => {
   // Data logo asli
   const originalLogos = [
     { id: 1, img: "/Halal1.webp", name: "Halal ID" },
-    { id: 2, img: "/Halal1.webp", name: "Halal ID 2" },
+    { id: 2, img: "/Halal2.webp", name: "Halal ID 2" },
   ];
 
   // Trik duplikasi: Kita gandakan array agar Swiper tidak patah saat loop
@@ -30,7 +30,7 @@ const LogoMarquee = () => {
           speed={5000} // Durasi geser (ms), makin besar makin lambat/halus
           autoplay={{
             delay: 0, // Wajib 0 agar jalan terus tanpa berhenti
-            disableOnInteraction: false,
+            disableOnInteraction: true,
           }}
           slidesPerView={2}
           spaceBetween={20}

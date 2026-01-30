@@ -14,6 +14,36 @@ const Header = ({ slides = [] }) => {
     {
       id: 1,
       imageUrl:
+        'https://res.cloudinary.com/diotafsul/image/upload/v1769766840/hampers_mamida_zgfiw1.jpg',
+      title: 'Hampers Lebaran Kue Mamida',
+      description:
+        'Sempurnakan momen fitrah bersama keluarga tercinta. Kue Kering Mamida hadir dengan bahan-bahan berkualitas untuk menciptakan kehangatan di setiap gigitan. Sajian nyaman, hati pun bahagia.',
+      buttonText: 'Lihat Menu Kue',
+      buttonLink: '#food-display',
+    },
+    {
+      id: 2,
+      imageUrl:
+        'https://res.cloudinary.com/diotafsul/image/upload/v1769766761/GreetingCard_waa2qk.png',
+      title: 'Ramadhan Kareem',
+      description:
+        'Selamat menunaikan ibadah puasa 1447 H. Semoga Ramadhan kali ini membawa berkah dan kebahagiaan bagi kita semua.',
+      buttonText: 'Pesan Kue Custom',
+      buttonLink: '/custom-order',
+    },
+    {
+      id: 3,
+      imageUrl:
+        'https://res.cloudinary.com/diotafsul/image/upload/v1769729965/WhatsApp_Image_2026-01-29_at_21.02.04_h1rl8n.jpg',
+      title: 'Fresh from the Oven',
+      description:
+        'Semua kue dibuat fresh dengan bahan berkualitas',
+      buttonText: 'Hubungi Kami',
+      buttonLink: '/contact',
+    },
+    {
+      id: 4,
+      imageUrl:
         'https://res.cloudinary.com/diotafsul/image/upload/v1769729965/WhatsApp_Image_2026-01-29_at_21.03.51_cd6rtl.jpg',
       title: 'Order your favourite cake here',
       description:
@@ -22,7 +52,7 @@ const Header = ({ slides = [] }) => {
       buttonLink: '#food-display',
     },
     {
-      id: 2,
+      id: 5,
       imageUrl:
         'https://res.cloudinary.com/diotafsul/image/upload/v1766226490/Cover_Birthday_jj8bji.png',
       title: 'Kue Ulang Tahun untuk Momen Spesial',
@@ -32,7 +62,7 @@ const Header = ({ slides = [] }) => {
       buttonLink: '/custom-order',
     },
     {
-      id: 3,
+      id: 6,
       imageUrl:
         'https://res.cloudinary.com/diotafsul/image/upload/v1769729965/WhatsApp_Image_2026-01-29_at_21.02.04_h1rl8n.jpg',
       title: 'Fresh from the Oven',

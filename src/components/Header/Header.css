@@ -44,7 +44,7 @@
     background-color: #00000063;
     padding: 12px 20px;
     border-radius: 12px;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(1px);
   }
   
   .header-content h2 {

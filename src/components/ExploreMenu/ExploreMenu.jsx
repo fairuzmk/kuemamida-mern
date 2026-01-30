@@ -47,11 +47,11 @@ const ExploreMenu = ({ category, setCategory }) => {
             <div >
               <img
                 src="https://res.cloudinary.com/diotafsul/image/upload/v1764819766/kuemamida_featured_ogod7v.png"
-                alt="Featured"
+                alt="Cookies Raya"
                 className={category === 'Featured' ? 'active' : ''}
               />
             </div>
-            <p>Featured</p>
+            <p>Cookies Raya</p>
           </div>
 
         
@@ -67,7 +67,7 @@ const ExploreMenu = ({ category, setCategory }) => {
                 className={category === 'Bundling' ? 'active' : ''}
               />
             </div>
-            <p>Bundling</p>
+            <p>Hampers Raya</p>
           </div>
 
           {/* Tabs: Kategori dari DB (aktif saja) */}
