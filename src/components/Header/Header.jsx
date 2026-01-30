@@ -25,9 +25,9 @@ const Header = ({ slides = [] }) => {
       id: 2,
       imageUrl:
         'https://res.cloudinary.com/diotafsul/image/upload/v1766226490/Cover_Birthday_jj8bji.png',
-      title: 'Kue Custom untuk Momen Spesial',
+      title: 'Kue Ulang Tahun untuk Momen Spesial',
       description:
-        'Rayakan ulang tahun, anniversary, atau acara keluarga dengan kue custom yang bisa kamu desain sendiri.',
+        'Rayakan ulang tahun, anniversary, atau acara keluarga dengan kue ulang tahun sesuai keinginanmu',
       buttonText: 'Pesan Kue Custom',
       buttonLink: '/custom-order',
     },
@@ -37,7 +37,7 @@ const Header = ({ slides = [] }) => {
         'https://res.cloudinary.com/diotafsul/image/upload/v1769729965/WhatsApp_Image_2026-01-29_at_21.02.04_h1rl8n.jpg',
       title: 'Fresh from the Oven',
       description:
-        'Semua kue dibuat fresh setiap hari dengan bahan berkualitas, tanpa stok lama di chiller.',
+        'Semua kue dibuat fresh dengan bahan berkualitas',
       buttonText: 'Hubungi Kami',
       buttonLink: '/contact',
     },
