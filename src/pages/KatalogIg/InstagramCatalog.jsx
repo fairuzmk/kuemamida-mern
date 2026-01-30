@@ -67,7 +67,7 @@ export default function InstagramCatalog() {
           }`}
         >
           <img
-            src="https://res.cloudinary.com/diotafsul/image/upload/v1764819766/kuemamida_featured_ogod7v.png"
+            src="https://res.cloudinary.com/diotafsul/image/upload/v1764819934/kuemamida/wbq6q2uzzmtlgdgx1cs0.png"
             alt="Featured"
           />
           <p>Birthday Cake</p>
