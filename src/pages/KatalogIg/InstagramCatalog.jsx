@@ -12,7 +12,7 @@ export default function InstagramCatalog() {
 
   const [products, setProducts] = useState([]);
   const [customcake, setCustomcake] = useState([]);
-  const [category, setCategory] = useState("featured");
+  const [category, setCategory] = useState("catalog-birthday");
   const [loading, setLoading] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -45,7 +45,7 @@ export default function InstagramCatalog() {
   }, [category]);
 
   const displayData =
-    category === "featured" ? customcake : products;
+    category === "catalog-birthday" ? customcake : products;
 
   // ===== PAGINATION LOGIC =====
   const totalPages = Math.ceil(displayData.length / ITEMS_PER_PAGE);
@@ -61,14 +61,14 @@ export default function InstagramCatalog() {
       {/* ===== TAB MENU ===== */}
       <div className="catalog-menu-list">
         <div
-          onClick={() => setCategory("featured")}
+          onClick={() => setCategory("catalog-birthday")}
           className={`catalog-menu-list-item ${
-            category === "featured" ? "active" : ""
+            category === "catalog-birthday" ? "active" : ""
           }`}
         >
           <img
             src="https://res.cloudinary.com/diotafsul/image/upload/v1764819934/kuemamida/wbq6q2uzzmtlgdgx1cs0.png"
-            alt="Featured"
+            alt="Birthday Cake"
           />
           <p>Birthday Cake</p>
         </div>

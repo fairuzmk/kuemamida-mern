@@ -87,6 +87,18 @@ const ExploreMenu = ({ category, setCategory }) => {
             </div>
           ))}
 
+        {/* ===== Kue Ulang Tahun (IG Catalog) ===== */}
+        <div
+          onClick={() => setCategory("kue-ultah")}
+          className="explore-menu-list-item"
+        >
+          <img
+            src="https://res.cloudinary.com/diotafsul/image/upload/v1764819934/kuemamida/wbq6q2uzzmtlgdgx1cs0.png"
+            alt="Kue Ulang Tahun"
+            className={category === "kue-ultah" ? "active" : ""}
+          />
+          <p>Kue Ultah</p>
+        </div>
           
         </div>
     </div>

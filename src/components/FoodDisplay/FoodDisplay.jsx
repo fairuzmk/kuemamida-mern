@@ -4,6 +4,7 @@ import { StoreContext } from '../../context/StoreContext';
 import FoodItem from '../FoodItem/FoodItem';
 import axios from 'axios';
 import HamperItemLebaran from '../FoodItem/HamperItemLebaran';
+import IgBirthdayGrid from '../../pages/KatalogIg/IgBirthdayGrid';
 
 const FoodDisplay = ({ category }) => {
   const { food_list, url } = useContext(StoreContext);
@@ -87,6 +88,14 @@ const FoodDisplay = ({ category }) => {
       </div>
     );
   }
+
+  if (category === "kue-ultah") {
+    return (
+      <div className="food-display">
+        <IgBirthdayGrid />
+      </div>
+    );
+  }
   
 
   return (
@@ -135,6 +144,7 @@ const FoodDisplay = ({ category }) => {
           </a>
         </div>
       )}
+
 
       
     </div>
