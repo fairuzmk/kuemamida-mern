@@ -46,7 +46,7 @@ const ExploreMenu = ({ category, setCategory }) => {
           >
             <div >
               <img
-                src="https://res.cloudinary.com/diotafsul/image/upload/v1764819766/kuemamida_featured_ogod7v.png"
+                src="https://res.cloudinary.com/diotafsul/image/upload/v1769785685/cookiesraya_p5drei.webp"
                 alt="Cookies Raya"
                 className={category === 'Featured' ? 'active' : ''}
               />
@@ -62,7 +62,7 @@ const ExploreMenu = ({ category, setCategory }) => {
           >
             <div >
               <img
-                src="https://res.cloudinary.com/diotafsul/image/upload/v1764819765/kuemamida_Combo_manw09.png"
+                src="https://res.cloudinary.com/diotafsul/image/upload/v1769785684/hampersraya_d5lgi6.webp"
                 alt="Featured"
                 className={category === 'Bundling' ? 'active' : ''}
               />
@@ -93,7 +93,7 @@ const ExploreMenu = ({ category, setCategory }) => {
           className="explore-menu-list-item"
         >
           <img
-            src="https://res.cloudinary.com/diotafsul/image/upload/v1764819934/kuemamida/wbq6q2uzzmtlgdgx1cs0.png"
+            src="https://res.cloudinary.com/diotafsul/image/upload/v1769785683/kueultah_heqqq8.webp"
             alt="Kue Ulang Tahun"
             className={category === "kue-ultah" ? "active" : ""}
           />
