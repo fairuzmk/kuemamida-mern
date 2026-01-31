@@ -62,7 +62,7 @@ const ExploreMenu = ({ category, setCategory }) => {
           >
             <div >
               <img
-                src="https://res.cloudinary.com/diotafsul/image/upload/v1769826206/Labelkuemamidahampers_w124jj.webp"
+                src="https://res.cloudinary.com/diotafsul/image/upload/v1769826801/Labelkuemamidahampers_smxdcl.webp"
                 alt="Featured"
                 className={category === 'Bundling' ? 'active' : ''}
               />
